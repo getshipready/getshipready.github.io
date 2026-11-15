@@ -1,0 +1,143 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ship-Ready: your tests pass, your first user will still break it</title><meta name="description" content="Proof clicks through sign-up, checkout and cancel like a stranger would, before your first user does. Backed by a rerunnable scanner: same findings every run, file and line, CI exit code. Free Lite, $39 Crew.">
+<meta property="og:title" content="Ship-Ready: your tests pass, your first user will still break it"><meta property="og:description" content="Proof clicks through sign-up, checkout and cancel like a stranger would, before your first user does. Backed by a rerunnable scanner: same findings every run, file and line, CI exit code. Free Lite, $39 Crew."><meta property="og:image" content="https://getshipready.github.io/assets/og.png"><meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Fraunces:ital,wght@1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css"><link rel="icon" href="assets/icon-512.png"></head><body>
+<header class="nav"><div class="wrap"><a class="logo" href="index.html"><i>✓</i>Ship-Ready</a>
+<nav><a href="index.html#crew">The Crew</a><a href="index.html#example">Worked example</a><a href="lite.html">Free skills</a><a href="audit.html">Audit</a><a href="index.html#pricing">Pricing</a></nav>
+<div class="right"><a class="btn btn-ghost btn-sm" href="https://github.com/getshipready/ship-ready-skills">★ GitHub</a><a class="btn btn-primary btn-sm" href="crew.html">Get the Crew</a></div></div></header>
+<section class="hero hero-proof"><div class="wrap grid"><div>
+<span class="eyebrow"><b></b>For apps built with Lovable · Bolt · v0 · Cursor · Claude Code</span>
+<h1>Your tests pass.<br>Your first user will <em class="s">still break it.</em></h1>
+<p class="lead"><b>Proof</b> clicks through sign-up, checkout and cancel like a stranger would, and shows you where they get stuck, before they do. Then the crew fixes it, like the customer who cancels and keeps Pro because nobody handled the Stripe webhook. Backed by a scanner with <b>the same findings every run</b>: file, line, CI exit code.</p>
+<div class="cta-row"><a class="btn btn-primary" href="lite.html">Start free with Lite</a><a class="btn btn-ghost" href="crew.html">Get the Crew · $39</a></div>
+<div class="install"><span class="p">$</span><span>claude plugin install ship-ready-lite --marketplace getshipready/ship-ready-skills</span><button class="c" data-copy="claude plugin install ship-ready-lite --marketplace getshipready/ship-ready-skills">copy</button></div>
+<div class="proof"><span>Click-through tests for sign-up, pay, cancel</span><span>Cancelled users lose access, paid users keep it</span><span>Same findings every run</span><span>File + line, CI exit code</span><span>Runs locally, no code upload</span></div>
+</div><div class="hero-visual"><div class="term"><div class="term-bar"><i></i><i></i><i></i><span>~/promptpad · claude</span></div><div class="tb">
+<div class="tl"><span class="t-dim">›</span>&nbsp;<span class="t-lime">Use proof-launch-tests. Can a new user pay?</span></div>
+<div class="tl gap t-dim"><span class="emo">🧪</span>&nbsp;Proof · scanner says 99/100 · clicking anyway</div>
+<div class="tl t-dim"><span class="emo">🧪</span>&nbsp;Proof · wrote money-paths.spec.ts · Chromium</div>
+<div class="fr gap"><span class="tag tag-p">PASS</span><span class="ft">forged Stripe webhook → 400</span><span class="fl">webhook:10</span></div>
+<div class="fr"><span class="tag tag-p">PASS</span><span class="ft">checkout without a session → 401</span><span class="fl">checkout:10</span></div>
+<div class="fr"><span class="tag tag-p">PASS</span><span class="ft">/admin logged out → /login</span><span class="fl">middleware:13</span></div>
+<div class="fr"><span class="tag tag-h">GAP</span><span class="ft">PROOF-001 no /login or /signup page</span><span class="fl">middleware:14</span></div>
+<div class="fr"><span class="tag tag-h">GAP</span><span class="ft">PROOF-002 no way to start a payment</span><span class="fl">checkout:18</span></div>
+<div class="fr"><span class="tag tag-h">GAP</span><span class="ft">PROOF-003 no way to save or log out</span><span class="fl">page.tsx:3</span></div>
+<div class="tl gap"><span class="t-lime">10 passed</span>&nbsp;<span class="t-dim">· 10 skipped · 5 fixme · 2nd run identical</span></div>
+<div class="tl t-dim"><span class="emo">🧪</span>&nbsp;Routing → Keymaster · Tally · Medic</div></div></div>
+<div class="score-card sc-proof"><div class="row"><small>PROMPTPAD · AFTER FIXES</small></div>
+<div class="row"><span>Scanner</span><span class="verdict v-green">99/100 · READY</span></div>
+<div class="row"><span>Proof</span><span class="verdict v-red">3 high dead ends</span></div>
+<small>Same app. The scan was green. A new user still couldn't sign up.</small></div></div></div></section>
+
+<div class="strip"><div class="wrap"><b>Runs in</b><span>Claude Code</span><span>Cursor</span><span>Codex</span><span>Claude.ai</span><span>ChatGPT</span><span>Gemini</span><span class="sep"></span><b>Knows</b><span>Next.js</span><span>Vite</span><span>Supabase</span><span>Stripe</span><span>Vercel</span></div></div>
+
+<section class="line-top why-local"><div class="wrap"><div class="sec-head"><div class="kicker">Why local</div><h2>URL checkers can't see your database rules. <em class="s">Fix shops need your repo.</em></h2>
+<p>Lite and the Crew run on your machine, inside your own AI tool. No new upload. The scanner is a local script with zero network calls. Your code only goes where your AI coding tool already sends it. No GitHub app, no third-party scanner account.</p></div>
+<table class="cmp"><tr><th></th><th>Free URL checkers</th><th>Done-for-you fix services</th><th class="us">Ship-Ready Lite / Crew</th></tr>
+<tr><td>Sees DB rules and server code</td><td class="no">No, public URL only</td><td>Yes</td><td class="us"><span class="yes">✓</span> Yes</td></tr>
+<tr><td>New upload or third-party scanner account</td><td>No</td><td class="no">Yes: ZIP or repo access</td><td class="us"><span class="yes">✓</span> No</td></tr>
+<tr><td>Same findings every run, file + line</td><td class="no">No</td><td class="no">Varies</td><td class="us"><span class="yes">✓</span> Yes, CI exit code</td></tr></table>
+<p class="small" style="color:var(--dim);margin-top:12px">Want us to run it for you instead? The <a href="audit.html" style="color:inherit;text-decoration:underline">$129 Audit</a> needs read access to your repo, like any fix service.</p></div></section>
+
+<section><div class="wrap"><div class="sec-head"><div class="kicker">The gap after "it works"</div><h2>AI builders get you to a demo. <em class="s">Not to launch.</em></h2>
+<p>The app runs, the UI looks great, and five problems sit underneath. You can't see them from the browser. Attackers can.</p></div>
+<div class="prob">
+<div class="card"><div class="ic">🔓</div><h3>Open database</h3><p>RLS off or <code>using (true)</code>. Anyone with your public anon key can read every row.</p></div>
+<div class="card"><div class="ic">🔑</div><h3>Leaked keys</h3><p>Service-role and Stripe keys in the repo or behind a <code>NEXT_PUBLIC_</code> prefix.</p></div>
+<div class="card"><div class="ic">💸</div><h3>Free "Pro"</h3><p>Customers who cancel and keep Pro because <code>subscription.deleted</code> is never handled. Unsigned webhooks, prices sent from the browser.</p></div>
+<div class="card"><div class="ic">🚪</div><h3>Fake auth</h3><p>Admin checks in <code>useEffect</code>. The UI hides the data, but the API still serves it.</p></div>
+<div class="card"><div class="ic">🧯</div><h3>No launch basics</h3><p>Ignored build errors, no rollback, no monitoring, auth emails landing in spam.</p></div></div>
+<div class="callout"><span>⚠</span><span><b>It already happened at scale.</b> In 2025 a researcher scanned 1,645 apps showcased by one AI app builder and found 170 (about 10%) with database rules that let anyone read or write user data. It became <a href="https://www.cve.org/CVERecord?id=CVE-2025-48757">CVE-2025-48757</a>. The builder's own scanner only checked that a policy <i>existed</i>, not that it was correct. Ship-Ready checks correctness. It's still happening in 2026: <a href="https://www.securityscanner.dev/reports/2026-q2">securityscanner.dev</a> found RLS-off tables with real user data in about 7% of the Lovable and Bolt apps it scanned (Q2 2026), and <a href="https://reeve.page/blog/what-secrets-leak-from-vibe-coded-apps">Reeve</a> found 2,096 of 3,680 reachable Supabase-backed apps (57%) answering a logged-out table read (Aug 2026).</span></div>
+</div></section>
+
+<section id="crew" class="line-top"><div class="wrap"><div class="sec-head"><div class="kicker">Meet the crew</div><h2>Nine specialists. <em class="s">One lead.</em> Zero hand-waving.</h2>
+<p>Each agent has one job, a deep playbook, shared tools and a strict output format. Harbor runs the team so you just ask one question: <i>"is this safe to launch?"</i></p></div>
+<div class="crew"><div class="agent boss"><div class="av">⚓</div><h3>Harbor</h3><div class="role">Launch lead · router</div>
+<p>Your agent's tech lead. Harbor reads the repo, runs the scanner, decides who works on what, stops at the gates where only you should act, and hands you a scored report.</p>
+<ul style="margin-top:10px"><li>Maps your stack and data flows</li><li>Runs the 59-check scan</li><li>Routes work to the right specialist</li><li>Holds two human gates</li><li>Writes the ship report and score</li></ul></div>
+<div class="agent"><div class="av">🛡</div><h3>Sentinel</h3><div class="role">Security</div><ul><li>Leaked & public-prefixed keys</li><li>Stored XSS, headers, CSP</li><li>Prompt-injection text in repo</li><li>AI-credit abuse</li></ul></div>
+<div class="agent"><div class="av">🔒</div><h3>Warden</h3><div class="role">Supabase RLS</div><ul><li>RLS off / using(true)</li><li>Missing WITH CHECK</li><li>Self-promotion to admin</li><li>Public buckets, service_role</li></ul></div>
+<div class="agent"><div class="av">🔑</div><h3>Keymaster</h3><div class="role">Auth</div><ul><li>Client-only admin checks</li><li>Unauthenticated API routes</li><li>Redirect & OAuth bugs</li><li>Middleware + getUser()</li></ul></div>
+<div class="agent"><div class="av">💳</div><h3>Tally</h3><div class="role">Stripe payments</div><ul><li>Unsigned webhooks</li><li>Price tampering</li><li>Client-set is_pro</li><li>Test → live switch</li></ul></div>
+<div class="agent"><div class="av">🚀</div><h3>Pilot</h3><div class="role">Deploy</div><ul><li>Env var matrix</li><li>Ignored build errors</li><li>Domains & previews</li><li>Rollback plan</li></ul></div>
+<div class="agent"><div class="av">⚡</div><h3>Torque</h3><div class="role">Performance</div><ul><li>N+1 queries</li><li>Missing indexes</li><li>Bundle weight</li><li>Core Web Vitals</li></ul></div>
+<div class="agent"><div class="av">🩺</div><h3>Medic</h3><div class="role">Bug triage</div><ul><li>Repro before fix</li><li>Root cause, smallest diff</li><li>Regression test</li><li>Breaks the AI fix loop</li></ul></div>
+<div class="agent"><div class="av">📣</div><h3>Beacon</h3><div class="role">Launch</div><ul><li>SEO & OG tags</li><li>Legal page drafts</li><li>Email deliverability</li><li>Monitoring, launch posts</li></ul></div>
+<div class="agent wide"><div class="av">🧪</div><h3>Proof</h3><div class="role">Launch tests</div><ul><li>Playwright click-through tests</li><li>Signup, login, logout</li><li>Stripe test checkout + webhook</li><li>Gated pages and APIs</li><li>GitHub Actions workflow</li></ul></div></div>
+<div class="coverage"><div class="cov-head"><span>What gets checked</span><span class="cov-note">Every finding cited to file and line. Alongside a pentest, not instead of one.</span></div><ol>
+<li><b>01</b> Security</li><li><b>02</b> Database access (RLS)</li><li><b>03</b> Auth</li><li><b>04</b> Payments</li><li><b>05</b> Deploy</li><li><b>06</b> Performance</li><li><b>07</b> Bug triage</li><li><b>08</b> Launch basics</li><li><b>09</b> Click-through tests</li></ol></div></div></section>
+
+<section class="line-top"><div class="wrap"><div class="sec-head"><div class="kicker">How it works</div><h2>From "it works" to a ship score in one session.</h2></div>
+<div class="steps">
+<div class="step"><div class="n">01 · install</div><h3>One line</h3><p>Add the Crew as a Claude Code plugin, or drop the skill folders into Cursor, Codex or Claude.ai.</p><pre>claude plugin install ship-ready-crew --marketplace ./ship-ready-crew</pre></div>
+<div class="step"><div class="n">02 · audit</div><h3>Harbor scans and routes</h3><p>A deterministic scanner reads your repo offline, then Harbor sends each finding to the specialist who owns it, with file:line evidence.</p><pre>Use harbor-launch-lead. Is this app safe to launch?</pre></div>
+<div class="step"><div class="n">03 · fix &amp; ship</div><h3>Fix, gate, re-scan</h3><p>Specialists propose minimal diffs and SQL with rollbacks. You approve at two gates, rotate keys, and re-scan until the verdict turns green.</p><pre>Verdict: READY · score 99/100</pre></div></div></div></section>
+
+<section id="example" class="line-top"><div class="wrap example"><div>
+<div class="kicker">Worked example, included</div><h2>We broke an app on purpose. <em class="s">Then audited it.</em></h2>
+<p class="lead" style="margin-top:16px">PromptPad is a realistic Next.js + Supabase + Stripe app with the mistakes AI builders actually make. The Crew audits it end to end. You get the broken repo, the fixed repo, both reports, the patch and the scorecard, so you know exactly what you're buying.</p>
+<div class="ba"><div class="card"><small class="num">BEFORE</small><div class="big t-red">0</div><p>13 critical · 7 high · 18 medium · 11 low<br><span class="verdict v-red">DO NOT SHIP</span></p></div>
+<div class="card"><small class="num">AFTER</small><div class="big" style="color:var(--lime)">99</div><p>0 critical · 0 high · 1 low (accepted)<br><span class="verdict v-green">READY</span></p></div></div>
+<table class="inc"><tr><td>Anyone could read every user's email</td><td>Warden: owner-only RLS, safe public view</td></tr>
+<tr><td>Any user could make themselves admin</td><td>Warden: column grants + <code>is_admin()</code></td></tr>
+<tr><td>Fake webhook = free Pro</td><td>Tally: signed, idempotent webhook + entitlements</td></tr>
+<tr><td>$49 plan for $0.50</td><td>Tally: fixed Price IDs on the server</td></tr>
+<tr><td>A comment told AI reviewers to "skip this file"</td><td>Sentinel: reported as SEC-009, not obeyed</td></tr></table>
+</div><div class="shot"><img src="assets/report-shot.png" alt="Ship-Ready report for PromptPad: score 0, 13 critical findings"></div></div></section>
+
+<section class="line-top"><div class="wrap"><div class="sec-head"><div class="kicker">What's in the box</div><h2>Real tools, not a prompt in a PDF.</h2></div>
+<div class="box">
+<div class="card"><div class="k">10</div><h3>Named agents</h3><p>Harbor + 9 specialists, a 700 to 3,500-word playbook each, with intake, workflow, output contract and acceptance checks.</p></div>
+<div class="card"><div class="k">59</div><h3>Scanner checks</h3><p>Offline Python, no installs. File:line evidence, secrets redacted, Markdown/JSON output, CI exit code.</p></div>
+<div class="card"><div class="k">11</div><h3>Playbooks</h3><p>RLS patterns + live SQL check, Stripe, auth, deploy, OWASP map with a key rotation runbook, perf, bugs, launch, launch tests.</p></div>
+<div class="card"><div class="k">1</div><h3>Excel scorecard</h3><p>Live formulas: score, verdict, per-agent counts, manual-check progress, fix-plan tracker.</p></div>
+<div class="card"><div class="k">12</div><h3>Templates</h3><p>Project brief, findings CSV, handoff CSV, fix plan, bug report, ship report, blank scorecard, Playwright config, auth setup, money-path spec, two-user RLS spec, CI workflow.</p></div>
+<div class="card"><div class="k">2</div><h3>Human gates</h3><p>Before anything touches production or money, the crew stops and asks you.</p></div>
+<div class="card"><div class="k">6</div><h3>Install targets</h3><p>Claude Code plugin, Claude.ai, ChatGPT, Cursor, Codex/AGENTS.md, Gemini.</p></div>
+<div class="card"><div class="k">0→99</div><h3>Worked audit</h3><p>Broken repo, fixed repo, both reports, ~510-line patch, filled scorecard.</p></div></div></div></section>
+
+<section class="line-top"><div class="wrap narrow"><div class="sec-head center" style="text-align:center"><div class="kicker">Why a crew</div><h2>Checklists tell you what to look for. <em class="s">The Crew looks.</em></h2></div>
+<table class="cmp"><tr><th></th><th>Checklist / prompt packs</th><th class="us">Ship-Ready Crew</th></tr>
+<tr><td>Who does the work</td><td>You, reading a list</td><td class="us">10 named agents with a lead that routes</td></tr>
+<tr><td>Evidence</td><td>"Check your RLS"</td><td class="us">file:line, the exact policy, the attack test</td></tr>
+<tr><td>Automated scan</td><td class="no">A few one-off scripts</td><td class="us">59 checks, one scanner, one report, CI exit code</td></tr>
+<tr><td>RLS correctness (not just "exists")</td><td class="no">—</td><td class="us"><span class="yes">✓</span> using(true), WITH CHECK, privileged columns</td></tr>
+<tr><td>Score you can track</td><td class="no">—</td><td class="us"><span class="yes">✓</span> /100 + Excel scorecard</td></tr>
+<tr><td>Full worked audit</td><td class="no">Snippets</td><td class="us"><span class="yes">✓</span> broken → fixed repo, patch, both reports</td></tr>
+<tr><td>Prompt-injection aware</td><td class="no">—</td><td class="us"><span class="yes">✓</span> repo text is data, steering text is flagged</td></tr>
+<tr><td>Launch tests you can rerun</td><td class="no">—</td><td class="us"><span class="yes">✓</span> Playwright money-path tests + GitHub Actions</td></tr>
+<tr><td>Install</td><td>Copy files by hand</td><td class="us">One line in Claude Code</td></tr></table></div></section>
+
+<section id="pricing" class="line-top"><div class="wrap"><div class="sec-head center" style="text-align:center"><div class="kicker">Pricing</div><h2>Start free. <em class="s">Ship with the crew.</em></h2><p class="center" style="max-width:560px">Use the free skills on your own. Buy the Crew when you want the whole job done. Book the audit when you'd rather we run it for you.</p></div>
+<div class="whois"><div class="kicker" style="text-align:center">Which one is you?</div><div class="whois-grid">
+<a href="lite.html"><span class="q">"I just built my first app with Lovable, Bolt or Cursor."</span><span class="a">Start with the free Lite skills · $0</span></a>
+<a href="__GUMROAD_CREW_URL__"><span class="q">"I ship apps and want this on every one."</span><span class="a">The Crew, one-time, rerun it on every app · $39</span></a>
+<a href="__GUMROAD_CREW_URL__"><span class="q">"I build apps for clients."</span><span class="a">Run the Crew before each handover and give the client the scored report · $39</span></a>
+<a href="audit.html"><span class="q">"Just check it for me."</span><span class="a">Agent-run audit, a human reviews every finding · $129</span></a>
+</div></div>
+<div class="pricing">
+<div class="plan"><div class="name">Ship-Ready Lite</div><div class="price">$0</div><div class="desc">53 single-task skills + a router, on GitHub. MIT.</div>
+<ul><li>53 skills across 8 areas</li><li>One-line Claude Code install</li><li>Works in Cursor, Codex, Claude.ai</li><li>Copy-paste SQL, commands, checklists</li></ul>
+<a class="btn btn-ghost" href="lite.html">Browse the free skills</a></div>
+<div class="plan feat"><div class="name">Ship-Ready Crew</div><div class="price">$39 <small>one-time</small></div><div class="desc">The 10-agent team, scanner, scorecard and worked example.</div>
+<ul><li>Harbor + 9 named specialists, deep playbooks</li><li>Offline scanner: 59 checks, file:line evidence, CI exit code</li><li>Paste-ready fix prompt for Lovable, Bolt or Cursor under every finding</li><li>Ship score /100 + Excel scorecard with live formulas</li><li>PromptPad worked audit: 0 → 99, full patch</li><li>11 reference guides + 12 templates</li><li>Claude Code plugin, Claude.ai, ChatGPT, Cursor, Codex, Gemini</li><li>v1.x updates included</li></ul>
+<a class="btn btn-primary" href="__GUMROAD_CREW_URL__">Get the Crew · $39</a><div class="anchor">One-time price. Rerun it on every app you build.</div></div>
+<div class="plan"><div class="name">Agent-run audit</div><div class="price">$129 <small>per app</small></div><div class="desc">We run the Crew on your repo. A human reviews every finding.</div>
+<ul><li>Scored report (PDF + Markdown)</li><li>Prioritized fix plan with patches</li><li>Live RLS check with your SQL output</li><li>One re-scan after you fix</li><li>48-hour turnaround</li></ul>
+<a class="btn btn-ghost" href="audit.html">Book an audit</a><div class="anchor"><a href="sample.html" style="color:inherit;text-decoration:underline">See a full sample report</a></div></div></div></div></section>
+
+<section class="line-top"><div class="wrap"><div class="libcard"><div><div class="kicker">Free on GitHub</div><h2 style="font-size:clamp(28px,3.4vw,40px)">53 skills for the stuff AI builders skip.</h2>
+<p class="lead" style="margin-top:14px;font-size:17px">RLS policy writer, Stripe webhook verifier, auth redirect fixer, Vercel build doctor, N+1 hunter, launch checklist and 47 more. MIT licensed. Every skill has steps, real code and a "done when" checklist.</p>
+<div class="chips"><span class="chip">security<b>8</b></span><span class="chip">supabase<b>9</b></span><span class="chip">auth<b>6</b></span><span class="chip">payments<b>6</b></span><span class="chip">deploy<b>7</b></span><span class="chip">performance<b>5</b></span><span class="chip">debugging<b>7</b></span><span class="chip">launch<b>5</b></span></div></div>
+<div><div class="install" style="margin-top:0"><span class="p">$</span><span>claude plugin install ship-ready-lite --marketplace getshipready/ship-ready-skills</span><button class="c" data-copy="claude plugin install ship-ready-lite --marketplace getshipready/ship-ready-skills">copy</button></div>
+<div class="cta-row" style="margin-top:16px"><a class="btn btn-ghost" href="lite.html">Browse all 53 →</a><a class="btn btn-ghost" href="https://github.com/getshipready/ship-ready-skills">★ Star on GitHub</a></div></div></div></div></section>
+
+<section class="line-top"><div class="wrap narrow"><div class="sec-head"><div class="kicker">FAQ</div><h2>Questions</h2></div><div class="faq"><details><summary>I don't know what RLS is. Is this for me?</summary><p>Yes. Built for people who shipped with Lovable, Bolt, v0 or Cursor and want to know it's safe. Harbor explains every finding in plain English, says why it matters and gives the exact fix. You make the final calls.</p></details><details><summary>Is this really a problem?</summary><p>Outside scans keep finding about 7% of Lovable and Bolt apps with tables anyone could read (securityscanner.dev, Q2 2026). In a separate sweep, Reeve found 57% of reachable Supabase-backed apps answering a logged-out table read (Aug 2026). Those scans only see what a logged-out visitor sees. Ship-Ready walks your agent through a two-user check: can a second logged-in user read the first user's data?</p></details><details><summary>Which tools does it work with?</summary><p>Claude Code installs it in one line as a plugin. The same skills work in Cursor, Codex and other AGENTS.md agents, and as uploadable skills in Claude.ai. ChatGPT, Claude Projects and Gemini get paste-in system prompts.</p></details><details><summary>Which stacks?</summary><p>Best coverage: Next.js or Vite + Supabase + Stripe on Vercel or Netlify, which is what most AI builders generate. Firebase, Clerk, Auth.js and other hosts are covered in the playbooks with less scanner support.</p></details><details><summary>Is it safe to install?</summary><p>Yes, and you can check. The packs are plain Markdown skills plus one offline Python scanner you can read. There is no npm package and no install script, so nothing runs when you add it. Worth asking of any skills pack: on 22 Oct GitHub flagged npm versions of two popular skills collections as malware.</p></details><details><summary>Will it change my code without asking?</summary><p>No. The crew works in your local repo and proposes minimal diffs. Two human gates are built in. Rotating keys, changing dashboards, applying production migrations and deploying are always your call.</p></details><details><summary>Is this a penetration test?</summary><p>No. It's static analysis plus guided reviews by agents that follow senior-engineer playbooks. It catches the mistakes AI builders make most often. For regulated data, pair it with a professional pentest.</p></details><details><summary>How is this different from a checklist or prompt pack?</summary><p>A checklist tells you what to look for. The Crew does the looking: a deterministic scanner with file:line evidence, a lead agent that routes work to specialists, a score you can track, and a full worked audit so you can see exactly what you'll get.</p></details><details><summary>Refunds?</summary><p>If the Crew doesn't find anything worth fixing in your app, email us within 14 days for a refund.</p></details><details><summary>Why isn't my score 0 when I have lots of findings?</summary><p>Each type of issue costs points once, at its worst severity, so one pattern repeated 70 times does not bury everything else. The report still lists every occurrence. Fix the pattern and they all go away together.</p></details></div></div></section>
+
+<section class="final"><div class="wrap"><h2>Launch the app you built, <em class="s">not the holes in it.</em></h2><p class="lead center" style="margin:0 auto">One install. Ten agents. A score you can trust before real users find the gaps.</p>
+<div class="cta-row" style="margin-top:30px"><a class="btn btn-primary" href="crew.html">Get the Crew · $39</a><a class="btn btn-ghost" href="audit.html">Or have us run it · $129</a></div></div></section>
+<footer><div class="wrap"><a class="logo" href="index.html"><i>✓</i>Ship-Ready</a><span>Launch crews for vibe-coded apps.</span>
+<nav><a href="crew.html">Crew</a><a href="lite.html">Free skills</a><a href="audit.html">Audit</a><a href="https://github.com/getshipready/ship-ready-skills">GitHub</a><a href="sample.html">Sample report</a></nav></div></footer>
+<script>document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>{navigator.clipboard.writeText(b.dataset.copy);b.textContent='copied';setTimeout(()=>b.textContent='copy',1500)}))</script>
+</body></html>
