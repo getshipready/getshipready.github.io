@@ -12,7 +12,7 @@
 <h1 style="font-size:clamp(38px,5vw,62px);margin:20px 0 18px">Your tests pass. Your first user will <em class="s">still break it.</em></h1>
 <p class="lead"><b>Proof</b> leads the Crew. It writes Playwright tests that click through sign-up, login, checkout and cancel like a stranger would, signs a test Stripe webhook to prove payment grants access exactly once, and leaves a GitHub Actions workflow that reruns them on every pull request. On our demo app the scanner said 99/100. Proof found that nobody could sign up.</p>
 <p class="lead" style="margin-top:14px">The money example: a customer cancels and keeps Pro, because the app never handles <code>customer.subscription.deleted</code>. <b>Tally</b> fixes that drift both ways, with signed, idempotent webhooks that write the subscription's real state. Backing it all: a scanner with the same findings every run, file and line on each, and an exit code that fails CI on anything high or critical.</p>
-<div class="cta-row" style="margin-top:22px"><a class="btn btn-primary" href="__GUMROAD_CREW_URL__">Get the Crew · $39</a><a class="btn btn-ghost" href="lite.html">Try Lite free first</a></div>
+<div class="cta-row" style="margin-top:22px"><a class="btn btn-primary" href="#checkout-soon" data-checkout="crew">Get the Crew · $39</a><a class="btn btn-ghost" href="lite.html">Try Lite free first</a></div>
 <div class="proof" style="margin-top:22px"><span>Proof: sign-up, pay, cancel tests</span><span>Tally: no access drift</span><span>Same findings every run</span><span>File + line, CI exit code</span><span>Runs locally</span><span>Human gates</span></div>
 <h2 style="font-size:30px;margin:64px 0 18px">The team</h2><div class="acc"><details open><summary><span class="av">⚓</span><span class="t">Harbor · Launch lead<small>harbor-launch-lead</small></span></summary>
 <div class="body"><ul><li>Intake: stack, users, money flows, live or not</li><li>Runs <code>shipready_scan.py</code>, groups findings by owner</li><li>Routing table for 30+ symptoms; incident mode for 'we're leaking now'</li><li>Gate 1 before anything touches prod; Gate 2 before launch</li><li>Writes <code>ship-report.md</code> + Excel scorecard</li></ul></div></details><details><summary><span class="av">🛡</span><span class="t">Sentinel · Security<small>sentinel-security-audit</small></span></summary>
@@ -42,10 +42,15 @@
 <aside class="buybox"><div class="cover"><img src="assets/cover-crew.png" alt="Ship-Ready Crew cover"></div>
 <div class="price">$39</div><div class="small" style="margin-top:0">One-time · v1.x updates included</div>
 <ul><li>10 agent skills + router</li><li>Scanner (59 checks) + Excel scorecard</li><li>Fix prompts for Lovable, Bolt, Cursor</li><li>11 reference guides, 12 templates</li><li>Full worked audit (0 → 99)</li><li>Claude Code · Claude.ai · ChatGPT · Cursor · Codex · Gemini</li></ul>
-<a class="btn btn-primary" style="width:100%;justify-content:center" href="__GUMROAD_CREW_URL__">Get the Crew</a>
+<a class="btn btn-primary" style="width:100%;justify-content:center" href="#checkout-soon" data-checkout="crew">Get the Crew</a>
 <p class="small">Not sure yet? <a href="sample.html" style="color:var(--text);text-decoration:underline">Read the full PromptPad report free</a>: all 49 findings, no email needed.</p>
 <p class="small" style="margin-top:16px">Rather not do it yourself? <a href="audit.html" style="color:var(--text);text-decoration:underline">We run the Crew for you · $129</a></p></aside>
-</div></div><footer><div class="wrap"><a class="logo" href="index.html"><i>✓</i>Ship-Ready</a><span>Launch crews for vibe-coded apps.</span>
+</div></div>
+
+<section id="checkout-soon" class="line-top"><div class="wrap narrow"><div class="sec-head"><div class="kicker">Store</div><h2>Checkout is almost ready.</h2></div>
+<p>The Crew ($39, one-time) and the Audit ($129 per app) will be available here as soon as the store listing is live. Lite is free now.</p>
+<div class="cta-row" style="margin-top:22px"><a class="btn btn-primary" href="lite.html">Start free with Lite</a><a class="btn btn-ghost" href="https://github.com/getshipready/ship-ready-skills">Get Lite on GitHub</a></div></div></section>
+<footer><div class="wrap"><a class="logo" href="index.html"><i>✓</i>Ship-Ready</a><span>Launch crews for vibe-coded apps.</span>
 <nav><a href="crew.html">Crew</a><a href="lite.html">Free skills</a><a href="audit.html">Audit</a><a href="https://github.com/getshipready/ship-ready-skills">GitHub</a><a href="sample.html">Sample report</a></nav></div></footer>
 <script>document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>{navigator.clipboard.writeText(b.dataset.copy);b.textContent='copied';setTimeout(()=>b.textContent='copy',1500)}))</script>
 </body></html>
