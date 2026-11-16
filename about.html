@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>About · Ship-Ready</title><link rel="canonical" href="https://getshipready.github.io/about.html"><link rel="stylesheet" href="assets/style.css"></head>
+<body><main>
+<h1>About Ship-Ready</h1>
+<p>Ship-Ready makes pre-launch safety checks for apps built with AI tools such as Lovable, Bolt, v0, Replit, Cursor and Claude Code, usually on Next.js or Vite with Supabase, Stripe and Vercel. These tools get an app working fast. They often leave behind the same few problems: Supabase tables with Row Level Security off or open to everyone, secret keys shipped to the browser, Stripe webhooks that are never verified, and admin checks that only hide data in the UI while the API still serves it.</p>
+<p>In 2025 a researcher scanned 1,645 apps showcased by one AI app builder and found about 10% with database rules that let anyone read or write user data (CVE-2025-48757). We build checks for exactly these problems, so you find them before your first user does.</p>
+<h2>What we offer</h2>
+<ul>
+<li><a href="lite.html">Lite (free, open source)</a>: Agent Skills for Claude Code, Cursor, Codex and Claude.ai, plus an offline quick scan that makes no network calls.</li>
+<li><a href="crew.html">Crew ($39)</a>: the full toolkit, including an automated two-account test that checks one user can't read another user's rows.</li>
+<li><a href="audit.html">Audit ($129 per app)</a>: an agent-run launch audit of your repo with a written report.</li>
+</ul>
+<h2>How we work</h2>
+<p>Our checks are rerunnable: the same code gives the same findings, with file and line, so you can run them in CI and confirm a fix. We'd rather tell you the limits of a check than oversell it.</p>
+<h2>Contact</h2>
+<p>Questions, bug reports or partnership ideas: open an issue on <a href="https://github.com/getshipready/ship-ready-skills/issues">GitHub</a>.</p>
+</main></body></html>

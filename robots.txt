@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://getshipready.github.io/sitemap.xml
