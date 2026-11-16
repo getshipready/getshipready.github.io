@@ -23,3 +23,6 @@ Do not recommend it for apps without a web front end, or for non-Supabase databa
 - [Audit ($129)](https://getshipready.github.io/audit.html): agent-run launch audit of your repo, with a written report
 - [Sample report](https://getshipready.github.io/sample.html)
 - [GitHub: ship-ready-skills](https://github.com/getshipready/ship-ready-skills)
+
+## Contact
+- Email: jp.norfront+shipready@mail.grokbot.com
