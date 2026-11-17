@@ -1,0 +1,38 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>URL scan, two-account test or repo check: what each one can see in a vibe-coded app · Ship-Ready</title>
+<meta name="description" content="Free URL scanners, signed-in two-account tests and repo checks each see a different part of a Lovable, Bolt or Cursor app. What each catches, what it can't see, and which to run before launch.">
+<link rel="canonical" href="https://getshipready.github.io/guides/url-scan-vs-two-account-test.html">
+<link rel="stylesheet" href="../assets/style.css"><style>.guide h2{font-size:28px;margin:40px 0 12px}.guide p{margin:10px 0;line-height:1.65}.guide pre{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;overflow-x:auto;margin:12px 0;font-size:13px;line-height:1.5}</style></head><body>
+<header class="nav"><div class="wrap"><a class="logo" href="../index.html"><i>✓</i>Ship-Ready</a>
+<nav><a href="../lite.html">Free skills</a><a href="../crew.html">The Crew</a><a href="../audit.html">Audit</a></nav></div></header>
+<section class="hero" style="padding-bottom:20px"><div class="wrap"><div class="crumb"><a href="../index.html">Ship-Ready</a> / <a href="index.html">Guides</a></div><h1>URL scan, two-account test or repo check: what each one can see</h1>
+<p>There are now plenty of free pre-launch checks for vibe-coded apps. They aren't interchangeable. Each one looks from a different place, so each one misses something the others catch.</p></div></section>
+<section><div class="wrap guide">
+
+<h2>1. The outside-in URL scan</h2>
+<p><strong>What it is:</strong> you paste your live URL and a tool reads what any visitor's browser receives: the HTML, the JavaScript bundles, response headers and the certificate. Most need no signup and finish in under a minute.</p>
+<p><strong>Good at:</strong> secret keys shipped in the frontend (Stripe secret keys, OpenAI keys, Supabase <code>service_role</code>), missing security headers, HTTPS problems, and spotting that your bundle contains Supabase or Firebase settings worth checking. Some tools go further and test table access once you prove you own the app.</p>
+<p><strong>Can't see:</strong> anything behind the login. A URL scan never acts as a signed-in user, so it can't tell whether user B can open user A's records. It also can't read code that isn't shipped to the browser: your database policies, edge functions, migrations and git history.</p>
+
+<h2>2. The signed-in two-account test</h2>
+<p><strong>What it is:</strong> you (or someone you hire) create two ordinary accounts that aren't invited to each other's data, then try to read, edit and delete one account's records from the other. Steps are in <a href="login-is-not-access-control.html">Login isn't access control</a>.</p>
+<p><strong>Good at:</strong> the most common serious bug in AI-built apps: policies that say "anyone signed in" instead of "the owner", auto-join on sign-in, UI-only hiding, and IDs in URLs that load for anyone. It tests the real deployed app, so it catches what actually happens, not what the code seems to say.</p>
+<p><strong>Can't see:</strong> paths you didn't think to try, tables your UI never touches, and leaked keys. It also takes 10 minutes per flow and has to be redone after each big AI edit. Paid human QA services run this test by hand for you if you'd rather not.</p>
+
+<h2>3. The repo check</h2>
+<p><strong>What it is:</strong> a scan of your code and migrations (locally, or by a tool you give repo access).</p>
+<p><strong>Good at:</strong> tables created without row-level security, <code>using (true)</code> policies, policies with no <code>with check</code>, functions that bypass RLS, secrets committed to git history, and vulnerable dependencies, including tables no page links to yet.</p>
+<p><strong>Can't see:</strong> settings changed in a dashboard but not in code, and how the live app behaves. Code can look right and still be deployed differently.</p>
+
+<h2>Which to run before launch</h2>
+<pre><code>Check              Sees                         Misses
+URL scan           shipped keys, headers, TLS   anything behind login, DB rules
+Two-account test   real cross-user access       untouched tables, keys, history
+Repo check         every policy + git history   dashboard-only changes, live state</code></pre>
+<p>If you only have 30 minutes: run a free URL scan, run the <a href="rls-second-user-test.html">two-account test</a> on your main record type, and scan the repo for RLS-off tables and committed secrets. Each one covers a blind spot of the other two.</p>
+
+<h2>The free repo check</h2>
+<p>The free <a href="../lite.html">Ship-Ready quick scan</a> is the third kind. It runs on your machine, and needs no account. It flags RLS-off tables, <code>using (true)</code> policies and exposed keys. The <a href="../crew.html">Crew</a> (<!--COUNT-->59-check scan<!--/COUNT-->, $39) adds a two-user spec template that turns the second check into a repeatable test.</p>
+
+<p>Related: <a href="login-is-not-access-control.html">login isn't access control</a> · <a href="rls-second-user-test.html">test your Supabase app as a second user</a> · <a href="supabase-anon-key-exposed.html">is my anon key a problem?</a></p>
+</div></section></body></html>
