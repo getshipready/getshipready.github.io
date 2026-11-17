@@ -1,0 +1,58 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Is my Lovable app's Supabase database exposed? A 10-minute self-check · Ship-Ready</title>
+<meta name="description" content="Five checks you can run yourself in about 10 minutes: RLS off, using(true) policies, views that skip RLS, SECURITY DEFINER functions anon can call, and keys in the browser. Copy-paste SQL included.">
+<link rel="canonical" href="https://getshipready.github.io/guides/lovable-supabase-self-check.html">
+<link rel="stylesheet" href="../assets/style.css"><style>.guide h2{font-size:28px;margin:40px 0 12px}.guide p{margin:10px 0;line-height:1.65}.guide pre{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;overflow-x:auto;margin:12px 0;font-size:13px;line-height:1.5}</style></head><body>
+<header class="nav"><div class="wrap"><a class="logo" href="../index.html"><i>✓</i>Ship-Ready</a>
+<nav><a href="../lite.html">Free skills</a><a href="../crew.html">The Crew</a><a href="../audit.html">Audit</a></nav></div></header>
+<section class="hero" style="padding-bottom:20px"><div class="wrap"><div class="crumb"><a href="../index.html">Ship-Ready</a> / Guides</div>
+<h1 style="margin:22px 0 18px;max-width:900px">Is my Lovable app's Supabase database exposed?</h1>
+<p class="lead">A 10-minute self-check you can run before launch. No tool needed: open the Supabase SQL editor for <b>your own</b> project and paste the queries below.</p></div></section>
+<section><div class="wrap guide" style="max-width:820px;padding-bottom:60px">
+<h2>Why this matters</h2>
+<p>The anon key in your frontend is public on purpose. Every visitor gets it. Row Level Security (RLS) policies are the only thing deciding what that key can read. In November 2026 a Hamburg security firm checked 34,545 Lovable apps on Supabase. On 7,403 of them it could read tables holding email addresses with nothing but that public key (<a href="https://www.crissyfield.de/research/lovable-en/">Crissy Field</a>). Nobody broke in: the database rules let strangers through. The firm notes this is not a confirmed leak rate and its sample isn't representative of all Lovable apps.</p>
+
+<h2>1. Tables with RLS turned off</h2>
+<pre><code>select tablename from pg_tables
+where schemaname = 'public' and not rowsecurity;</code></pre>
+<p>Any row returned is readable and writable by anyone with your anon key, unless grants block it. Fix: <code>alter table public.&lt;name&gt; enable row level security;</code> then add policies. Also search your migrations for <code>disable row level security</code>: a later migration can switch it back off.</p>
+
+<h2>2. Policies that let everyone in</h2>
+<pre><code>select tablename, policyname, cmd, roles, qual, with_check
+from pg_policies
+where schemaname = 'public'
+  and (qual = 'true' or with_check = 'true');</code></pre>
+<p><code>using (true)</code> means "every row, for every caller in these roles". That's fine for a public blog table and wrong for profiles, orders or messages. Scope it, for example <code>using (auth.uid() = user_id)</code>.</p>
+
+<h2>3. Views that skip your policies</h2>
+<pre><code>select c.relname as view_name
+from pg_class c join pg_namespace n on n.oid = c.relnamespace
+where n.nspname = 'public' and c.relkind = 'v'
+  and not coalesce(array_to_string(c.reloptions, ',') like '%security_invoker=true%', false);</code></pre>
+<p>By default a view runs as its owner, so it can return rows your RLS would hide. On Postgres 15+: <code>alter view public.&lt;name&gt; set (security_invoker = true);</code></p>
+
+<h2>4. SECURITY DEFINER functions the browser can call</h2>
+<pre><code>select p.proname
+from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+where n.nspname = 'public' and p.prosecdef
+  and has_function_privilege('anon', p.oid, 'execute');</code></pre>
+<p>These run with the owner's rights and are callable through <code>/rest/v1/rpc/</code> with the anon key. Either check <code>auth.uid()</code> inside, or <code>revoke execute on function public.&lt;name&gt; from anon, public;</code> and pin <code>set search_path = ''</code>.</p>
+
+<h2>5. Secrets that ship to the browser</h2>
+<pre><code>grep -rnE "service_role|sk_live_|SUPABASE_SERVICE" src/ app/ components/ 2&gt;/dev/null
+grep -rnE "(NEXT_PUBLIC|VITE|EXPO_PUBLIC)_[A-Z_]*(SECRET|SERVICE|PRIVATE)" . --include=*.env* 2&gt;/dev/null</code></pre>
+<p>Anything prefixed <code>NEXT_PUBLIC_</code>, <code>VITE_</code> or <code>EXPO_PUBLIC_</code> is bundled into the page. The <code>service_role</code> key bypasses RLS entirely and must never be there. If it was, rotate it in the Supabase dashboard.</p>
+
+<h2>Then test it like a stranger, and like a second user</h2>
+<p>Logged out, against your own project only:</p>
+<pre><code>curl "https://&lt;project-ref&gt;.supabase.co/rest/v1/&lt;table&gt;?select=*&amp;limit=1" \
+  -H "apikey: &lt;your anon key&gt;"</code></pre>
+<p>An empty <code>[]</code> on private tables is what you want. Then sign up a second test account and check it can't read the first account's rows. Logged-out checks (including most URL scanners) never test this second case.</p>
+
+<div class="libcard" style="margin-top:36px"><div><div class="kicker">Rather not do it by hand?</div>
+<h2 style="font-size:28px">Run the free quick scan</h2>
+<p>Ship-Ready Lite's quick scan runs 8 of these checks on your code, offline and read-only, and names the free skill that fixes each finding. The Crew ($39) runs the full <!--COUNT-->59-check scan<!--/COUNT--> plus a two-user test template.</p>
+<div class="cta-row"><a class="btn btn-primary" href="../lite.html">Free quick scan</a><a class="btn btn-ghost" href="../crew.html">The Crew · $39</a></div></div></div>
+</div></section>
+<footer><div class="wrap"><a class="logo" href="../index.html"><i>✓</i>Ship-Ready</a><span>Launch crews for vibe-coded apps.</span></div></footer>
+</body></html>

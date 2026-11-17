@@ -1,0 +1,55 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Supabase insert "works" but no row appears: the silent RLS failure (and the wrong fix) · Ship-Ready</title>
+<meta name="description" content="Your form shows success but the row never reaches your Supabase table. Usually it's RLS with no INSERT policy, a missing grant, or .insert().select(). How to find the real error, and why disabling RLS or with check (true) for everyone is the wrong fix.">
+<link rel="canonical" href="https://getshipready.github.io/guides/supabase-insert-success-no-row.html">
+<link rel="stylesheet" href="../assets/style.css"><style>.guide h2{font-size:28px;margin:40px 0 12px}.guide p{margin:10px 0;line-height:1.65}.guide pre{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;overflow-x:auto;margin:12px 0;font-size:13px;line-height:1.5}</style></head><body>
+<header class="nav"><div class="wrap"><a class="logo" href="../index.html"><i>✓</i>Ship-Ready</a>
+<nav><a href="../lite.html">Free skills</a><a href="../crew.html">The Crew</a><a href="../audit.html">Audit</a></nav></div></header>
+<section class="hero" style="padding-bottom:20px"><div class="wrap"><div class="crumb"><a href="../index.html">Ship-Ready</a> / Guides</div>
+<h1 style="margin:22px 0 18px;max-width:900px">Your form says "success". Your Supabase table is empty.</h1>
+<p class="lead">This is almost always a failed insert that nobody checked. supabase-js doesn't throw on a database error, it returns <code>{ error }</code>. If your code ignores it, the success toast shows anyway. Here's how to find the real error, fix it without opening your table to the world, and check the fix.</p></div></section>
+<section><div class="wrap guide" style="max-width:820px;padding-bottom:60px">
+<h2>Step 1: see the real error</h2>
+<p>Open DevTools → Network, submit the form, and click the request to <code>/rest/v1/your_table</code>. Or log it in code:</p>
+<pre><code>const { error } = await supabase.from("waitlist").insert({ email });
+if (error) { console.error(error); /* show a failure, not a success toast */ }</code></pre>
+<p>No request at all usually means your Supabase URL or key env vars are missing in production. Add them in your host and redeploy.</p>
+
+<h2>Step 2: match the error</h2>
+<pre><code>new row violates row-level security policy ... RLS is on and no INSERT policy allows this role
+permission denied for table waitlist ........... the role (anon/authenticated) has no grant on the table
+(insert works only without .select()) .......... .insert().select() also needs SELECT on the table</code></pre>
+<p>All three come back as code <code>42501</code>, so read the message, not just the code.</p>
+
+<h2>Step 3: the wrong fixes (what AI tools often suggest)</h2>
+<p>When you paste the error into an AI assistant, it often proposes one of these. Each one makes the error go away and opens a hole:</p>
+<pre><code>alter table waitlist disable row level security;      -- anyone with your anon key can read the whole list
+create policy ... for all using (true) with check (true); -- same, plus edit and delete
+grant all on waitlist to anon;                          -- plus a wide policy = public emails</code></pre>
+<p>Your anon key ships inside your frontend on purpose. If the table can be read with it, your waitlist emails are public.</p>
+
+<h2>Step 4: the right fix</h2>
+<p><strong>Public form (waitlist, contact):</strong> let anon insert, and nothing else.</p>
+<pre><code>grant insert on public.waitlist to anon;
+create policy "anon can join waitlist" on public.waitlist
+  for insert to anon with check (true);
+-- no select policy for anon: nobody can read the list from the browser</code></pre>
+<p>Then call <code>.insert({ email })</code> <em>without</em> <code>.select()</code>. If you add <code>.select()</code>, Postgres has to let anon read the new row, and you'd need a SELECT grant and policy you don't want. Read the list from the dashboard or a server route using the secret key.</p>
+<p><strong>Logged-in user creating their own rows:</strong> tie the row to the user.</p>
+<pre><code>grant insert, select on public.notes to authenticated;
+create policy "insert own" on public.notes for insert to authenticated
+  with check (auth.uid() = user_id);
+create policy "read own" on public.notes for select to authenticated
+  using (auth.uid() = user_id);</code></pre>
+
+<h2>Step 5: check it the way an attacker would</h2>
+<p>Log out (or use a private window) and try to read the table with only the anon key:</p>
+<pre><code>curl "https://YOUR-PROJECT.supabase.co/rest/v1/waitlist?select=*" \
+  -H "apikey: YOUR_ANON_KEY"</code></pre>
+<p>You want <code>[]</code>, even though the table now has rows. For per-user tables, also run the <a href="rls-second-user-test.html">second-user test</a>: user B must not see user A's notes.</p>
+
+<h2>Want this checked for every table?</h2>
+<p>The free <a href="../lite.html">Ship-Ready quick scan</a> runs locally and flags RLS-off tables, <code>using (true)</code> policies and exposed keys in your migrations. The <a href="../crew.html">Crew</a> (<!--COUNT-->59-check scan<!--/COUNT-->, $39) adds paste-ready fix prompts for each finding.</p>
+
+<p>Related: <a href="supabase-anon-key-exposed.html">is my anon key a problem?</a> · <a href="rls-second-user-test.html">test RLS as a second user</a> · <a href="lovable-supabase-self-check.html">the 10-minute Supabase self-check</a></p>
+</div></section></body></html>
