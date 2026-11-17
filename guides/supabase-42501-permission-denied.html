@@ -1,0 +1,68 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Supabase 42501 "permission denied for table" after the Oct 30 change: the safe fix · Ship-Ready</title>
+<meta name="description" content="New Supabase tables return 42501 permission denied since the October 30, 2026 Data API change. The fix is a GRANT, but copying the hint's GRANT ... TO anon can open a table to everyone. The safe order for Lovable, Bolt and Cursor apps.">
+<link rel="canonical" href="https://getshipready.github.io/guides/supabase-42501-permission-denied.html">
+<link rel="stylesheet" href="../assets/style.css"><style>.guide h2{font-size:28px;margin:40px 0 12px}.guide p{margin:10px 0;line-height:1.65}.guide pre{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;overflow-x:auto;margin:12px 0;font-size:13px;line-height:1.5}</style></head><body>
+<header class="nav"><div class="wrap"><a class="logo" href="../index.html"><i>✓</i>Ship-Ready</a>
+<nav><a href="../lite.html">Free skills</a><a href="../crew.html">The Crew</a><a href="../audit.html">Audit</a></nav></div></header>
+<section class="hero" style="padding-bottom:20px"><div class="wrap"><div class="crumb"><a href="../index.html">Ship-Ready</a> / <a href="index.html">Guides</a></div><h1>Supabase 42501 "permission denied for table": the safe fix</h1>
+<p>Your app worked yesterday. You (or your AI tool) added a new table, and now every request to it fails with <code>42501</code>. Nothing is broken. Supabase changed a default, and the fix takes one minute. But the fix the error suggests isn't always the one you want.</p></div></section>
+<section><div class="wrap guide">
+
+<h2>Why it started</h2>
+<p>Supabase <a href="https://supabase.com/changelog/45329-breaking-change-tables-not-exposed-to-data-and-graphql-api-automatically">announced on April 28, 2026</a> that new tables in the <code>public</code> schema are no longer exposed to the Data API automatically. It became the default for new projects from May 30, and was applied to all existing projects on <strong>October 30, 2026</strong>.</p>
+<p>Before, every new table was granted to <code>anon</code>, <code>authenticated</code> and <code>service_role</code> the moment it was created. Now a new table needs an explicit <code>GRANT</code> before <code>supabase-js</code> can reach it. Existing tables keep their grants. Apps that connect to Postgres directly (psql, an ORM, a server with a connection string) aren't affected.</p>
+<p>The error looks like this:</p>
+<pre><code>{
+  "code": "42501",
+  "message": "permission denied for table your_table",
+  "hint": "Grant the required privileges to the current role with: GRANT SELECT ON public.your_table TO anon;"
+}</code></pre>
+
+<h2>The trap: pasting the hint as-is</h2>
+<p>The hint names the role that made the failing request. If your app called the table before anyone signed in, that role is <code>anon</code>: anyone on the internet holding your public key. A grant only decides whether a role can touch the table at all. <strong>Row-level security decides which rows it gets.</strong> So:</p>
+<ul>
+<li>Grant to <code>anon</code> on a table with RLS <strong>off</strong>: the whole table is readable by anyone.</li>
+<li>Grant to <code>anon</code> with a <code>using (true)</code> policy: same result.</li>
+<li>Asking an AI tool to "fix the permission error" can produce a bulk <code>grant ... on all tables in schema public to anon, authenticated</code>. That re-opens every table, including the private ones you never meant to expose.</li>
+</ul>
+
+<h2>The safe fix, in order</h2>
+<p>Supabase's own guidance is to treat grant, RLS and policy as one unit. For a table that holds per-user data:</p>
+<pre><code>-- 1. Grant only the roles that need it (signed-in users, not anon)
+grant select, insert, update, delete on public.your_table to authenticated;
+
+-- 2. Turn on row-level security
+alter table public.your_table enable row level security;
+
+-- 3. Say which rows each user gets
+create policy "owner can read" on public.your_table
+  for select to authenticated using (auth.uid() = user_id);
+create policy "owner can write" on public.your_table
+  for insert to authenticated with check (auth.uid() = user_id);</code></pre>
+<p>Grant to <code>anon</code> only for genuinely public data (a product catalogue, published posts), and pair it with a <code>select</code>-only policy. Never grant <code>insert</code>, <code>update</code> or <code>delete</code> to <code>anon</code> unless you mean "anyone can write here".</p>
+
+<h2>If sign-up broke: "Database error saving new user"</h2>
+<p>A 42501 during sign-up is a different problem, and a grant to <code>anon</code> or <code>authenticated</code> won't fix it. Supabase Auth writes new users as its own role, <code>supabase_auth_admin</code>. If a trigger on <code>auth.users</code> copies each new user into your <code>profiles</code> table, that trigger runs as the Auth role and gets refused. <a href="https://supabase.com/docs/guides/troubleshooting/dashboard-errors-when-managing-users-N1ls4A#solution-for-trigger-related-issues">Supabase's fix</a> is to make the trigger function <code>security definer</code>, pin its search path, and write table names in full:</p>
+<pre><code>create or replace function public.handle_new_user()
+returns trigger language plpgsql
+security definer set search_path = ''
+as $$
+begin
+  insert into public.profiles (id) values (new.id);
+  return new;
+end;
+$$;</code></pre>
+<p>Check the Auth logs first: Supabase's <a href="https://supabase.com/docs/guides/troubleshooting/database-error-saving-new-user-RU_EwB">troubleshooting page</a> lists other causes too, like a missing table or an unmet constraint.</p>
+
+<h2>If the error happens for signed-in users</h2>
+<p>If the hint says <code>TO authenticated</code>, the user is signed in and only the grant is missing. Run step 1 for <code>authenticated</code>. If the request still fails, or returns no rows, the policy is the problem. See <a href="supabase-insert-success-no-row.html">insert "works" but no row appears</a>.</p>
+
+<h2>Check you didn't open it up</h2>
+<p>After the fix, open your live app in a private window, signed out, and confirm the new table's data doesn't load. Then run the <a href="rls-second-user-test.html">second-user test</a>: sign in as account B and try to read account A's rows. In the Table Editor, Supabase's Data API exposure badge and the Security Advisor also list tables worth reviewing.</p>
+
+<h2>Catch it in the repo</h2>
+<p>The free <a href="../lite.html">Ship-Ready quick scan</a> runs offline on your code and flags tables with RLS off and <code>using (true)</code> policies in your migrations, the two cases where an <code>anon</code> grant leaks data. The <a href="../crew.html">Crew</a> (<!--COUNT-->59-check scan<!--/COUNT-->, $39) adds more checks and a two-user test template.</p>
+
+<p>Related: <a href="supabase-anon-key-exposed.html">is my anon key a problem?</a> · <a href="rls-second-user-test.html">test your Supabase app as a second user</a> · <a href="supabase-view-bypasses-rls.html">views that bypass RLS</a></p>
+</div></section></body></html>
