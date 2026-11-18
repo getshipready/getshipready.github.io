@@ -5,7 +5,7 @@
   --r:14px;--sans:"Geist","Inter",system-ui,sans-serif;--mono:"Geist Mono","JetBrains Mono",ui-monospace,monospace;--serif:"Fraunces",Georgia,serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
 img{max-width:100%;display:block}
@@ -320,4 +320,39 @@ summary:focus-visible{outline-offset:-2px}
     section:not(.hero) .sec-head,section:not(.hero) .card,section:not(.hero) .agent,section:not(.hero) .step,section:not(.hero) .plan,section:not(.hero) .shot,section:not(.hero) .whois-grid a,section:not(.hero) .faq details{
       animation:v2-reveal linear backwards;animation-timeline:view();animation-range:entry 0% entry 35%}
   }
+}
+
+/* ===== design-v2 pass 2 ===== */
+.cmp th.rh{font:inherit;font-size:inherit;background:none;color:var(--muted);font-weight:400}
+.cmp th[scope=col]{font-weight:500}
+/* no-JS mobile nav: checkbox toggle, hidden on desktop */
+.nt{position:absolute;width:44px;height:44px;opacity:0;margin:0;cursor:pointer;z-index:2;right:18px;top:10px}
+.nt-btn{display:none}
+@media (max-width:640px){
+  .nav .wrap{position:relative}
+  .nt-btn{display:block;order:3;width:44px;height:44px;border:1px solid var(--line2);border-radius:10px;background:rgba(255,255,255,.02);position:relative;flex:none}
+  .nt-btn:before{content:"";position:absolute;left:12px;right:12px;height:2px;border-radius:2px;background:var(--text);top:15px;box-shadow:0 7px 0 var(--text),0 14px 0 var(--text)}
+  .nt:checked+.nt-btn{border-color:var(--lime)}
+  .nt:focus-visible+.nt-btn{outline:2px solid var(--lime);outline-offset:3px}
+  .nav .right{order:2}
+  .nav .wrap{gap:12px}
+  .nav .right{margin-left:auto}
+  .nt:checked~nav{display:flex;flex-direction:column;gap:0;position:absolute;top:64px;left:0;right:0;background:var(--bg2);border:1px solid var(--line2);border-radius:12px;padding:6px 0;box-shadow:0 24px 50px -20px rgba(0,0,0,.8);z-index:60;font-size:16px}
+  .nt:checked~nav a{padding:13px 20px;color:var(--text)}
+  .nt:checked~nav a:after{display:none}
+  .nt{right:18px}
+}
+/* install block: reserve height so the font swap cannot shift layout */
+.install{min-height:64px}
+@media (max-width:640px){.install{min-height:96px}}
+/* hero score card: decorative scan effect (pseudo-elements only, no layout impact) */
+.score-card{overflow:hidden}
+@media (prefers-reduced-motion:no-preference){
+  .score-card:before,.score-card:after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit}
+  .score-card:before{background:linear-gradient(180deg,transparent,rgba(198,244,50,.16) 50%,transparent) no-repeat;background-size:100% 46px;animation:v2-scan 4.4s cubic-bezier(.45,.05,.55,.95) infinite}
+  .score-card:after{background:linear-gradient(105deg,transparent 42%,rgba(255,255,255,.06) 50%,transparent 58%) no-repeat;background-size:260% 100%;animation:v2-sweep 4.4s ease-in-out infinite}
+  @keyframes v2-scan{0%{background-position:0 -60px}70%,100%{background-position:0 calc(100% + 60px)}}
+  @keyframes v2-sweep{0%,30%{background-position:140% 0}75%,100%{background-position:-40% 0}}
+  .score-card .verdict{animation:v2-tick 4.4s ease-in-out infinite}
+  @keyframes v2-tick{0%,35%,100%{filter:none}50%{filter:brightness(1.35) drop-shadow(0 0 6px rgba(61,220,151,.35))}}
 }

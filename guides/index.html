@@ -2,9 +2,10 @@
 <title>Guides: launch checks for Lovable, Bolt and Cursor apps · Ship-Ready</title>
 <meta name="description" content="Short, practical guides to the Supabase and Stripe mistakes that leak data in vibe-coded apps, each with a check you can run yourself.">
 <link rel="canonical" href="https://getshipready.github.io/guides/">
-<link rel="stylesheet" href="../assets/style.css"><style>.guide h2{font-size:28px;margin:40px 0 12px}.guide p{margin:10px 0;line-height:1.65}.guide pre{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;overflow-x:auto;margin:12px 0;font-size:13px;line-height:1.5}</style></head><body>
-<header class="nav"><div class="wrap"><a class="logo" href="../index.html"><i>✓</i>Ship-Ready</a>
+<link rel="stylesheet" href="../assets/style.css"><style>.guide h2{font-size:28px;margin:40px 0 12px}.guide p{margin:10px 0;line-height:1.65}.guide pre{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;overflow-x:auto;margin:12px 0;font-size:13px;line-height:1.5}</style><meta property="og:url" content="https://getshipready.github.io/guides/"><meta property="og:title" content="Guides: launch checks for Lovable, Bolt and Cursor apps · Ship-Ready"><meta property="og:description" content="Short, practical guides to the Supabase and Stripe mistakes that leak data in vibe-coded apps, each with a check you can run yourself."><meta property="og:image" content="https://getshipready.github.io/assets/og.png"><meta name="twitter:card" content="summary_large_image"></head><body>
+<header class="nav"><div class="wrap"><a class="logo" href="../index.html"><i>✓</i>Ship-Ready</a><input type="checkbox" id="nt" class="nt" aria-label="Menu"><label for="nt" class="nt-btn" aria-hidden="true"></label>
 <nav><a href="../lite.html">Free skills</a><a href="../crew.html">The Crew</a><a href="../audit.html">Audit</a></nav></div></header>
+<main id="main">
 <section class="hero"><div class="wrap"><div class="crumb"><a href="../index.html">Ship-Ready</a> / Guides</div><h1>Guides</h1>
 <p>Each guide covers one common Supabase or Stripe mistake in Lovable, Bolt and Cursor apps, with a check you can run yourself.</p></div></section>
 <section><div class="wrap guide"><ul style="list-style:none;padding:0;display:grid;gap:18px">
@@ -20,4 +21,5 @@
 <li><a href="supabase-anon-key-exposed.html">Supabase anon key exposed in my frontend: is that a problem?</a><br><span style="opacity:.75">Seeing your Supabase anon key in the browser is normal. What matters is your RLS policies and whether the service_role key leaked. How to tell the difference in 5 minutes.</span></li>
 <li><a href="supabase-insert-success-no-row.html">Supabase insert &quot;works&quot; but no row appears: the silent RLS failure (and the wrong fix)</a><br><span style="opacity:.75">Your form shows success but the row never reaches your Supabase table. Usually it&#x27;s RLS with no INSERT policy, a missing grant, or .insert().select(). How to find the real error, and why disabling RLS or with check (true) for everyone is the wrong fix.</span></li>
 <li><a href="supabase-view-bypasses-rls.html">Supabase view bypasses RLS? Fix it with security_invoker</a><br><span style="opacity:.75">Postgres views run as their owner by default, so a Supabase view can return rows your RLS policies would block. How to find those views with one query and fix them with security_invoker = true.</span></li>
-</ul></div></section></body></html>
+</ul></div></section></main>
+</body></html>

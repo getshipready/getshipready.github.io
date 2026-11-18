@@ -2,9 +2,10 @@
 <title>Supabase edge function returns 401 "Invalid JWT" after switching to the new API keys: the safe fix · Ship-Ready</title>
 <meta name="description" content="Moved to sb_publishable / sb_secret keys and your edge functions now return 401 Invalid JWT? Here&#x27;s the fix, and the step that keeps the function from going public.">
 <link rel="canonical" href="https://getshipready.github.io/guides/supabase-edge-function-invalid-jwt-new-keys.html">
-<link rel="stylesheet" href="../assets/style.css"><style>.guide h2{font-size:28px;margin:40px 0 12px}.guide p{margin:10px 0;line-height:1.65}.guide pre{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;overflow-x:auto;margin:12px 0;font-size:13px;line-height:1.5}.guide table{border-collapse:collapse;margin:14px 0;width:100%;font-size:14px}.guide th,.guide td{border:1px solid #2a2a2a;padding:8px 10px;text-align:left;vertical-align:top}</style></head><body>
-<header class="nav"><div class="wrap"><a class="logo" href="../index.html"><i>✓</i>Ship-Ready</a>
+<link rel="stylesheet" href="../assets/style.css"><style>.guide h2{font-size:28px;margin:40px 0 12px}.guide p{margin:10px 0;line-height:1.65}.guide pre{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;overflow-x:auto;margin:12px 0;font-size:13px;line-height:1.5}.guide table{border-collapse:collapse;margin:14px 0;width:100%;font-size:14px}.guide th,.guide td{border:1px solid #2a2a2a;padding:8px 10px;text-align:left;vertical-align:top}</style><meta property="og:url" content="https://getshipready.github.io/guides/supabase-edge-function-invalid-jwt-new-keys.html"><meta property="og:title" content="Supabase edge function returns 401 &quot;Invalid JWT&quot; after switching to the new API keys: the safe fix · Ship-Ready"><meta property="og:description" content="Moved to sb_publishable / sb_secret keys and your edge functions now return 401 Invalid JWT? Here&#x27;s the fix, and the step that keeps the function from going public."><meta property="og:image" content="https://getshipready.github.io/assets/og.png"><meta name="twitter:card" content="summary_large_image"></head><body>
+<header class="nav"><div class="wrap"><a class="logo" href="../index.html"><i>✓</i>Ship-Ready</a><input type="checkbox" id="nt" class="nt" aria-label="Menu"><label for="nt" class="nt-btn" aria-hidden="true"></label>
 <nav><a href="../lite.html">Free skills</a><a href="../crew.html">The Crew</a><a href="../audit.html">Audit</a></nav></div></header>
+<main id="main">
 <section class="hero" style="padding-bottom:20px"><div class="wrap"><div class="crumb"><a href="../index.html">Ship-Ready</a> / <a href="index.html">Guides</a></div><h1>Supabase edge function returns 401 "Invalid JWT" after switching to the new API keys: the safe fix</h1>
 <p>You switched your app from the old <code>eyJ…</code> anon key to the new <code>sb_publishable_…</code> key (Supabase retires the old keys by the end of 2026), and now your edge functions answer every call with:</p></div></section>
 <section><div class="wrap guide">
@@ -50,7 +51,7 @@ Deno.serve(
 
 <p>Pick the mode per function:</p>
 
-<table><tr><th>Who calls it</th><th><code>auth</code> mode</th><th>Note</th></tr><tr><td>Your signed-in users (from the app)</td><td><code>'user'</code></td><td>Most app functions. Rejects anyone not logged in.</td></tr><tr><td>A cron job, another function, your backend</td><td><code>'secret'</code></td><td>Secret key on the <code>apikey</code> header. Never in the browser.</td></tr><tr><td>Anyone with your app (public data)</td><td><code>'publishable'</code></td><td>The publishable key is public, so this does not stop strangers. Add a rate limit.</td></tr><tr><td>Stripe or another webhook</td><td><code>'none'</code> + verify the signature</td><td>Check <code>stripe-signature</code> with <code>constructEventAsync</code> before doing anything.</td></tr></table>
+<table><tr><th scope="col">Who calls it</th><th scope="col"><code>auth</code> mode</th><th scope="col">Note</th></tr><tr><td>Your signed-in users (from the app)</td><td><code>'user'</code></td><td>Most app functions. Rejects anyone not logged in.</td></tr><tr><td>A cron job, another function, your backend</td><td><code>'secret'</code></td><td>Secret key on the <code>apikey</code> header. Never in the browser.</td></tr><tr><td>Anyone with your app (public data)</td><td><code>'publishable'</code></td><td>The publishable key is public, so this does not stop strangers. Add a rate limit.</td></tr><tr><td>Stripe or another webhook</td><td><code>'none'</code> + verify the signature</td><td>Check <code>stripe-signature</code> with <code>constructEventAsync</code> before doing anything.</td></tr></table>
 
 <p>Not on the SDK? The older pattern still works: create a client with the caller's <code>Authorization</code> header, call <code>supabase.auth.getUser()</code>, and return 401 if there's no user.</p>
 
@@ -66,4 +67,5 @@ Deno.serve(
 <p>The free <a href="../lite.html">Ship-Ready quick scan</a> runs offline on your code and flags edge functions with <code>verify_jwt = false</code> and no caller check, plus leaked keys, RLS turned off and <code>using (true)</code> policies. The <a href="../crew.html">Crew</a> (<!--COUNT-->59-check scan<!--/COUNT-->, $39) adds more checks and a two-user test template.</p>
 
 <p>Related: <a href="supabase-legacy-api-keys-migration.html">Supabase is retiring the eyJ keys: the safe migration</a> · <a href="stripe-webhook-not-verified.html">Stripe webhook not verified</a> · <a href="supabase-anon-key-exposed.html">is my anon key a problem?</a></p>
-</div></section></body></html>
+</div></section></main>
+</body></html>

@@ -2,9 +2,10 @@
 <title>Is my Lovable app's Supabase database exposed? A 10-minute self-check · Ship-Ready</title>
 <meta name="description" content="Five checks you can run yourself in about 10 minutes: RLS off, using(true) policies, views that skip RLS, SECURITY DEFINER functions anon can call, and keys in the browser. Copy-paste SQL included.">
 <link rel="canonical" href="https://getshipready.github.io/guides/lovable-supabase-self-check.html">
-<link rel="stylesheet" href="../assets/style.css"><style>.guide h2{font-size:28px;margin:40px 0 12px}.guide p{margin:10px 0;line-height:1.65}.guide pre{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;overflow-x:auto;margin:12px 0;font-size:13px;line-height:1.5}</style></head><body>
-<header class="nav"><div class="wrap"><a class="logo" href="../index.html"><i>✓</i>Ship-Ready</a>
+<link rel="stylesheet" href="../assets/style.css"><style>.guide h2{font-size:28px;margin:40px 0 12px}.guide p{margin:10px 0;line-height:1.65}.guide pre{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;overflow-x:auto;margin:12px 0;font-size:13px;line-height:1.5}</style><meta property="og:url" content="https://getshipready.github.io/guides/lovable-supabase-self-check.html"><meta property="og:title" content="Is my Lovable app&#x27;s Supabase database exposed? A 10-minute self-check · Ship-Ready"><meta property="og:description" content="Five checks you can run yourself in about 10 minutes: RLS off, using(true) policies, views that skip RLS, SECURITY DEFINER functions anon can call, and keys in the browser. Copy-paste SQL included."><meta property="og:image" content="https://getshipready.github.io/assets/og.png"><meta name="twitter:card" content="summary_large_image"></head><body>
+<header class="nav"><div class="wrap"><a class="logo" href="../index.html"><i>✓</i>Ship-Ready</a><input type="checkbox" id="nt" class="nt" aria-label="Menu"><label for="nt" class="nt-btn" aria-hidden="true"></label>
 <nav><a href="../lite.html">Free skills</a><a href="../crew.html">The Crew</a><a href="../audit.html">Audit</a></nav></div></header>
+<main id="main">
 <section class="hero" style="padding-bottom:20px"><div class="wrap"><div class="crumb"><a href="../index.html">Ship-Ready</a> / Guides</div>
 <h1 style="margin:22px 0 18px;max-width:900px">Is my Lovable app's Supabase database exposed?</h1>
 <p class="lead">A 10-minute self-check you can run before launch. No tool needed: open the Supabase SQL editor for <b>your own</b> project and paste the queries below.</p></div></section>
@@ -54,5 +55,6 @@ grep -rnE "(NEXT_PUBLIC|VITE|EXPO_PUBLIC)_[A-Z_]*(SECRET|SERVICE|PRIVATE)" . --i
 <p>Ship-Ready Lite's quick scan runs 8 of these checks on your code, offline and read-only, and names the free skill that fixes each finding. The Crew ($39) runs the full <!--COUNT-->59-check scan<!--/COUNT--> plus a two-user test template.</p>
 <div class="cta-row"><a class="btn btn-primary" href="../lite.html">Free quick scan</a><a class="btn btn-ghost" href="../crew.html">The Crew · $39</a></div></div></div>
 </div></section>
+</main>
 <footer><div class="wrap"><a class="logo" href="../index.html"><i>✓</i>Ship-Ready</a><span>Launch crews for vibe-coded apps.</span></div></footer>
 </body></html>

@@ -1,11 +1,12 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Ship-Ready: your tests pass, your first user will still break it</title><meta name="description" content="Proof clicks through sign-up, checkout and cancel like a stranger would, before your first user does. Backed by a rerunnable scanner: same findings every run, file and line, CI exit code. Free Lite, $39 Crew.">
 <meta property="og:title" content="Ship-Ready: your tests pass, your first user will still break it"><meta property="og:description" content="Proof clicks through sign-up, checkout and cancel like a stranger would, before your first user does. Backed by a rerunnable scanner: same findings every run, file and line, CI exit code. Free Lite, $39 Crew."><meta property="og:image" content="https://getshipready.github.io/assets/og.png"><meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Fraunces:ital,wght@1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css"><link rel="icon" href="assets/icon-512.png"></head><body>
-<header class="nav"><div class="wrap"><a class="logo" href="index.html"><i>✓</i>Ship-Ready</a>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Fraunces:ital,wght@1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css"><link rel="icon" href="assets/icon-512.png"><link rel="canonical" href="https://getshipready.github.io/"><meta property="og:url" content="https://getshipready.github.io/"></head><body>
+<header class="nav"><div class="wrap"><a class="logo" href="index.html"><i>✓</i>Ship-Ready</a><input type="checkbox" id="nt" class="nt" aria-label="Menu"><label for="nt" class="nt-btn" aria-hidden="true"></label>
 <nav><a href="index.html#crew">The Crew</a><a href="index.html#example">Worked example</a><a href="lite.html">Free skills</a><a href="audit.html">Audit</a><a href="guides/">Guides</a><a href="index.html#pricing">Pricing</a></nav>
 <div class="right"><a class="btn btn-ghost btn-sm" href="https://github.com/getshipready/ship-ready-skills">★ GitHub</a><a class="btn btn-primary btn-sm" href="crew.html">Get the Crew</a></div></div></header>
+<main id="main">
 <section class="hero hero-proof"><div class="wrap grid"><div>
 <span class="eyebrow"><b></b>For apps built with Lovable · Bolt · v0 · Cursor · Claude Code</span>
 <h1>Your tests pass.<br>Your first user will <em class="s">still break it.</em></h1>
@@ -34,10 +35,10 @@
 
 <section class="line-top why-local"><div class="wrap"><div class="sec-head"><div class="kicker">Why local</div><h2>URL checkers can't see your database rules. <em class="s">Fix shops need your repo.</em></h2>
 <p>Lite and the Crew run on your machine, inside your own AI tool. No new upload. The scanner is a local script with zero network calls. Your code only goes where your AI coding tool already sends it. No GitHub app, no third-party scanner account.</p></div>
-<table class="cmp"><tr><th></th><th>Free URL checkers</th><th>Done-for-you fix services</th><th class="us">Ship-Ready Lite / Crew</th></tr>
-<tr><td>Sees DB rules and server code</td><td class="no">No, public URL only</td><td>Yes</td><td class="us"><span class="yes">✓</span> Yes</td></tr>
-<tr><td>New upload or third-party scanner account</td><td>No</td><td class="no">Yes: ZIP or repo access</td><td class="us"><span class="yes">✓</span> No</td></tr>
-<tr><td>Same findings every run, file + line</td><td class="no">No</td><td class="no">Varies</td><td class="us"><span class="yes">✓</span> Yes, CI exit code</td></tr></table>
+<table class="cmp"><tr><th scope="col"></th><th scope="col">Free URL checkers</th><th scope="col">Done-for-you fix services</th><th scope="col" class="us">Ship-Ready Lite / Crew</th></tr>
+<tr><th scope="row" class="rh">Sees DB rules and server code</th><td class="no">No, public URL only</td><td>Yes</td><td class="us"><span class="yes">✓</span> Yes</td></tr>
+<tr><th scope="row" class="rh">New upload or third-party scanner account</th><td>No</td><td class="no">Yes: ZIP or repo access</td><td class="us"><span class="yes">✓</span> No</td></tr>
+<tr><th scope="row" class="rh">Same findings every run, file + line</th><td class="no">No</td><td class="no">Varies</td><td class="us"><span class="yes">✓</span> Yes, CI exit code</td></tr></table>
 <p class="small" style="color:var(--dim);margin-top:12px">Want us to run it for you instead? The <a href="audit.html" style="color:inherit;text-decoration:underline">$129 Audit</a> needs read access to your repo, like any fix service.</p></div></section>
 
 <section><div class="wrap"><div class="sec-head"><div class="kicker">The gap after "it works"</div><h2>AI builders get you to a demo. <em class="s">Not to launch.</em></h2>
@@ -98,16 +99,16 @@
 <div class="card"><div class="k">0→99</div><h3>Worked audit</h3><p>Broken repo, fixed repo, both reports, ~510-line patch, filled scorecard.</p></div></div></div></section>
 
 <section class="line-top"><div class="wrap narrow"><div class="sec-head center" style="text-align:center"><div class="kicker">Why a crew</div><h2>Checklists tell you what to look for. <em class="s">The Crew looks.</em></h2></div>
-<table class="cmp"><tr><th></th><th>Checklist / prompt packs</th><th class="us">Ship-Ready Crew</th></tr>
-<tr><td>Who does the work</td><td>You, reading a list</td><td class="us">10 named agents with a lead that routes</td></tr>
-<tr><td>Evidence</td><td>"Check your RLS"</td><td class="us">file:line, the exact policy, the attack test</td></tr>
-<tr><td>Automated scan</td><td class="no">A few one-off scripts</td><td class="us">59 checks, one scanner, one report, CI exit code</td></tr>
-<tr><td>RLS correctness (not just "exists")</td><td class="no">—</td><td class="us"><span class="yes">✓</span> using(true), WITH CHECK, privileged columns</td></tr>
-<tr><td>Score you can track</td><td class="no">—</td><td class="us"><span class="yes">✓</span> /100 + Excel scorecard</td></tr>
-<tr><td>Full worked audit</td><td class="no">Snippets</td><td class="us"><span class="yes">✓</span> broken → fixed repo, patch, both reports</td></tr>
-<tr><td>Prompt-injection aware</td><td class="no">—</td><td class="us"><span class="yes">✓</span> repo text is data, steering text is flagged</td></tr>
-<tr><td>Launch tests you can rerun</td><td class="no">—</td><td class="us"><span class="yes">✓</span> Playwright money-path tests + GitHub Actions</td></tr>
-<tr><td>Install</td><td>Copy files by hand</td><td class="us">One line in Claude Code</td></tr></table></div></section>
+<table class="cmp"><tr><th scope="col"></th><th scope="col">Checklist / prompt packs</th><th scope="col" class="us">Ship-Ready Crew</th></tr>
+<tr><th scope="row" class="rh">Who does the work</th><td>You, reading a list</td><td class="us">10 named agents with a lead that routes</td></tr>
+<tr><th scope="row" class="rh">Evidence</th><td>"Check your RLS"</td><td class="us">file:line, the exact policy, the attack test</td></tr>
+<tr><th scope="row" class="rh">Automated scan</th><td class="no">A few one-off scripts</td><td class="us">59 checks, one scanner, one report, CI exit code</td></tr>
+<tr><th scope="row" class="rh">RLS correctness (not just "exists")</th><td class="no">—</td><td class="us"><span class="yes">✓</span> using(true), WITH CHECK, privileged columns</td></tr>
+<tr><th scope="row" class="rh">Score you can track</th><td class="no">—</td><td class="us"><span class="yes">✓</span> /100 + Excel scorecard</td></tr>
+<tr><th scope="row" class="rh">Full worked audit</th><td class="no">Snippets</td><td class="us"><span class="yes">✓</span> broken → fixed repo, patch, both reports</td></tr>
+<tr><th scope="row" class="rh">Prompt-injection aware</th><td class="no">—</td><td class="us"><span class="yes">✓</span> repo text is data, steering text is flagged</td></tr>
+<tr><th scope="row" class="rh">Launch tests you can rerun</th><td class="no">—</td><td class="us"><span class="yes">✓</span> Playwright money-path tests + GitHub Actions</td></tr>
+<tr><th scope="row" class="rh">Install</th><td>Copy files by hand</td><td class="us">One line in Claude Code</td></tr></table></div></section>
 
 <section id="pricing" class="line-top"><div class="wrap"><div class="sec-head center" style="text-align:center"><div class="kicker">Pricing</div><h2>Start free. <em class="s">Ship with the crew.</em></h2><p class="center" style="max-width:560px">Use the free skills on your own. Buy the Crew when you want the whole job done. Book the audit when you'd rather we run it for you.</p></div>
 <div class="whois"><div class="kicker" style="text-align:center">Which one is you?</div><div class="whois-grid">
@@ -141,6 +142,7 @@
 <section id="checkout-soon" class="line-top"><div class="wrap narrow"><div class="sec-head"><div class="kicker">Store</div><h2>Checkout is almost ready.</h2></div>
 <p>The Crew ($39, one-time) and the Audit ($129 per app) will be available here as soon as the store listing is live. Lite is free now.</p>
 <div class="cta-row" style="margin-top:22px"><a class="btn btn-primary" href="lite.html">Start free with Lite</a><a class="btn btn-ghost" href="https://github.com/getshipready/ship-ready-skills">Get Lite on GitHub</a></div></div></section>
+</main>
 <footer><div class="wrap"><a class="logo" href="index.html"><i>✓</i>Ship-Ready</a><span>Launch crews for vibe-coded apps. <a href="mailto:jp.norfront+shipready@mail.grokbot.com" style="text-decoration:underline">jp.norfront+shipready@mail.grokbot.com</a></span>
 <nav><a href="crew.html">Crew</a><a href="lite.html">Free skills</a><a href="audit.html">Audit</a><a href="guides/">Guides</a><a href="https://github.com/getshipready/ship-ready-skills">GitHub</a><a href="sample.html">Sample report</a></nav></div></footer>
 <script>document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>{navigator.clipboard.writeText(b.dataset.copy);b.textContent='copied';setTimeout(()=>b.textContent='copy',1500)}))</script>
