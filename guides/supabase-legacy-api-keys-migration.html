@@ -16,6 +16,9 @@
 <li>"Late 2026, TBC: Legacy API keys will be deleted": after that, apps that still use them stop working.</li>
 </ul>
 
+<h2>Already seeing "Legacy API keys are disabled" or "Invalid API key"?</h2>
+<p>That usually means the project's legacy keys are switched off (or it was restored from a pause without them), while something still sends an <code>eyJ</code> key. The usual suspects are a cron job, a nightly import or a server script, rather than the main app. Do steps 2–4 for that caller. If you just need things working again while you migrate, re-activate the legacy keys in Settings → API Keys: Supabase says deactivation is reversible.</p>
+
 <h2>Step 1: are you affected?</h2>
 <pre><code># in your project (Lovable: sync to GitHub first)
 grep -rn "eyJ" src/ .env* 2&gt;/dev/null | grep -iv test
@@ -38,7 +41,7 @@ grep -rlE "sb_secret_|service_role" dist/ .next/static/ build/ 2&gt;/dev/null</c
 <p>Any hit: move that call into an Edge Function or server route, then rotate the key in the dashboard. Deleting the line isn't enough; it's still in git history and old deploys.</p>
 
 <h2>Step 5: before you turn the old keys off</h2>
-<p>Supabase's checklist: there's no automatic usage indicator, so check every place that holds a key, including CI/CD and deploy scripts, webhooks and third-party integrations, cron jobs, workers and <code>pg_net</code> calls, and mobile builds already in users' hands. Deactivating the legacy keys in Settings → API Keys is reversible if you missed one.</p>
+<p>Supabase's migration guide says there's no automatic usage indicator (its <a href="https://supabase.com/docs/guides/auth/signing-keys">signing keys FAQ</a> mentions "last used" indicators on the API Keys page, so look there too, but don't rely on it alone). Check every place that holds a key, including CI/CD and deploy scripts, webhooks and third-party integrations, cron jobs, workers and <code>pg_net</code> calls, and mobile builds already in users' hands. Deactivating the legacy keys in Settings → API Keys is reversible if you missed one.</p>
 
 <h2>New key, same holes</h2>
 <p>Swapping keys changes nothing about who can read what. If a table was readable with the <code>anon</code> key, it's readable with the publishable key too. While you're in there, run the <a href="supabase-anon-key-exposed.html">5-minute anon-key check</a> and the <a href="rls-second-user-test.html">second-user test</a>.</p>
