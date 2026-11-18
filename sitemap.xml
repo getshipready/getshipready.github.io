@@ -20,4 +20,5 @@
   <url><loc>https://getshipready.github.io/guides/supabase-legacy-api-keys-migration.html</loc></url>
   <url><loc>https://getshipready.github.io/guides/supabase-edge-function-invalid-jwt-new-keys.html</loc></url>
   <url><loc>https://getshipready.github.io/guides/supabase-server-adapters-deprecated-withclaims.html</loc></url>
+  <url><loc>https://getshipready.github.io/guides/supabase-third-party-auth-clerk-oidc-rls.html</loc></url>
 </urlset>

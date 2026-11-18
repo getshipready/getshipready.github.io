@@ -1,0 +1,49 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Clerk or a custom OIDC provider on Supabase: 3 RLS traps when your app trusts another issuer · Ship-Ready</title>
+<meta name="description" content="Supabase now lets you add any OIDC provider from the Dashboard. Three easy mistakes turn signed-in users into anon, push you towards using (true), or let users from one issuer match another's rows. Fixes and a 1-minute check.">
+<link rel="canonical" href="https://getshipready.github.io/guides/supabase-third-party-auth-clerk-oidc-rls.html">
+<link rel="stylesheet" href="../assets/style.css"><style>.guide h2{font-size:28px;margin:40px 0 12px}.guide p{margin:10px 0;line-height:1.65}.guide pre{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;overflow-x:auto;margin:12px 0;font-size:13px;line-height:1.5}.guide table{border-collapse:collapse;margin:14px 0;width:100%;font-size:14px}.guide th,.guide td{border:1px solid #2a2a2a;padding:8px 10px;text-align:left;vertical-align:top}</style><meta property="og:url" content="https://getshipready.github.io/guides/supabase-third-party-auth-clerk-oidc-rls.html"><meta property="og:title" content="Clerk or a custom OIDC provider on Supabase: 3 RLS traps when your app trusts another issuer · Ship-Ready"><meta property="og:description" content="Supabase now lets you add any OIDC provider from the Dashboard. Three easy mistakes turn signed-in users into anon, push you towards using (true), or let users from one issuer match another's rows. Fixes and a 1-minute check."><meta property="og:image" content="https://getshipready.github.io/assets/og.png"><meta name="twitter:card" content="summary_large_image"></head><body>
+<header class="nav"><div class="wrap"><a class="logo" href="../index.html"><i>✓</i>Ship-Ready</a><input type="checkbox" id="nt" class="nt" aria-label="Menu"><label for="nt" class="nt-btn" aria-hidden="true"></label>
+<nav><a href="../lite.html">Free skills</a><a href="../crew.html">The Crew</a><a href="../audit.html">Audit</a></nav></div></header>
+<main id="main">
+<section class="hero" style="padding-bottom:20px"><div class="wrap"><div class="crumb"><a href="../index.html">Ship-Ready</a> / <a href="index.html">Guides</a></div><h1>Clerk or a custom OIDC provider on Supabase: 3 RLS traps when your app trusts another issuer</h1>
+<p>Supabase now has a <strong>Custom OIDC</strong> option under Authentication &gt; Third-Party Auth, next to Clerk, Auth0, WorkOS, Firebase and Cognito. Supabase's <a href="https://supabase.com/changelog/custom-oidc-third-party-auth">changelog</a>: "Supabase then accepts JWTs signed by that issuer."</p></div></section>
+<section><div class="wrap guide">
+<p>Your RLS policies were written for Supabase Auth tokens. Tokens from another issuer carry different claims, and three small gaps show up again and again. All quotes below are from Supabase's <a href="https://supabase.com/docs/guides/auth/third-party/custom-oidc">custom OIDC guide</a> unless noted.</p>
+
+<h2>Trap 1: no role claim, so every signed-in user is anon</h2>
+<p>"Without a <code>role</code> claim, requests run as the <code>anon</code> role."</p>
+<p>Your app shows a logged-in user, but every query acts as if nobody is signed in: empty lists or <code>42501 permission denied</code>. The tempting fix is to add <code>to anon</code> rules until data appears. That makes the data public.</p>
+<p><strong>Fix:</strong> issue tokens with <code>role: "authenticated"</code>. For Clerk, Supabase's <a href="https://supabase.com/docs/guides/auth/third-party/clerk">Clerk guide</a> says, if you can't use Clerk's Connect with Supabase page: "Add the role claim to Clerk session tokens by customizing them." Then delete any <code>anon</code> rules you added while debugging. More: <a href="supabase-42501-permission-denied.html">42501 permission denied</a>.</p>
+
+<h2>Trap 2: auth.uid() breaks on non-UUID user IDs</h2>
+<p>"<code>auth.uid()</code> casts <code>sub</code> to <code>uuid</code>, so it fails if your provider issues subjects that are not UUIDs." Clerk user IDs look like <code>user_2abc...</code>.</p>
+<p>When those policies start failing, an AI assistant will often patch them with <code>using (true)</code>. RLS stays on, and every signed-in user can read every row.</p>
+<p><strong>Fix:</strong> keep the provider's ID in a <code>text</code> column and compare it to the claim:</p>
+<pre><code>create policy "Users can read their own rows"
+  on table_name for select to authenticated
+  using (user_id = (select auth.jwt()-&gt;&gt;'sub'));</code></pre>
+
+<h2>Trap 3: two issuers, colliding user IDs</h2>
+<p>"Your project trusts every issuer you add, and <code>sub</code> values from different issuers can collide." If you run Supabase Auth and Clerk, or two OIDC providers, a policy that only checks <code>sub</code> can match a user from the wrong issuer.</p>
+<p><strong>Fix:</strong> add one restrictive policy per table that checks <code>iss</code>:</p>
+<pre><code>create policy "Restrict access to trusted issuers"
+  on table_name as restrictive to authenticated
+  using (
+    (auth.jwt()-&gt;&gt;'iss' = 'https://&lt;project-ref&gt;.supabase.co/auth/v1')
+    or (auth.jwt()-&gt;&gt;'iss' = 'https://login.example.com')
+  );</code></pre>
+<p>Supabase: "make sure you don't omit the <code>as restrictive</code> clause." Without it the policy is permissive and widens access instead of narrowing it.</p>
+
+<h2>Check it in one minute</h2>
+<ol><li>In the SQL editor:<pre><code>select tablename, policyname, permissive, roles, qual
+from pg_policies where schemaname = 'public'
+order by tablename;</code></pre>Look for a <code>qual</code> of <code>true</code>, <code>auth.uid()</code> on tables whose users come from your provider, <code>anon</code> in <code>roles</code> on tables that need a login, and (with more than one issuer) any table without a <code>RESTRICTIVE</code> row that checks <code>iss</code>.</li>
+<li>Sign in as two different users and confirm each sees only their own rows: <a href="rls-second-user-test.html">the second-user test</a>.</li></ol>
+
+<h2>Before you launch</h2>
+<p>The free <a href="../lite.html">Ship-Ready quick scan</a> runs offline on your code and flags leaked keys, RLS turned off, <code>using (true)</code> policies and edge functions with <code>verify_jwt = false</code> and no caller check. It does not check issuer (<code>iss</code>) policies yet, so run the query above. The <a href="../crew.html">Crew</a> (<!--COUNT-->59-check scan<!--/COUNT-->, $39) adds more checks and a two-user test template.</p>
+
+<p>Related: <a href="login-is-not-access-control.html">Login is not access control</a> · <a href="supabase-42501-permission-denied.html">42501 permission denied</a> · <a href="supabase-edge-function-invalid-jwt-new-keys.html">Edge function 401 Invalid JWT after the new keys</a></p>
+</div></section></main>
+</body></html>
