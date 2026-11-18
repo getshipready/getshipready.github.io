@@ -1,0 +1,52 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Supabase Security Advisor: &quot;Public Can Execute Dynamic SQL Function&quot; (exec_sql) and the 1-line fix · Ship-Ready</title>
+<meta name="description" content="Supabase&#x27;s Security Advisor now flags functions like exec_sql(query text) that anyone with your anon key can call to run their own SQL. What it means, a 30-second check, and the fix.">
+<link rel="canonical" href="https://getshipready.github.io/guides/supabase-exec-sql-dynamic-sql-function-advisor.html">
+<link rel="stylesheet" href="../assets/style.css"><style>.guide h2{font-size:28px;margin:40px 0 12px}.guide p{margin:10px 0;line-height:1.65}.guide pre{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;overflow-x:auto;margin:12px 0;font-size:13px;line-height:1.5}.guide table{border-collapse:collapse;margin:14px 0;width:100%;font-size:14px}.guide th,.guide td{border:1px solid #2a2a2a;padding:8px 10px;text-align:left;vertical-align:top}</style><meta property="og:url" content="https://getshipready.github.io/guides/supabase-exec-sql-dynamic-sql-function-advisor.html"><meta property="og:title" content="Supabase Security Advisor: &quot;Public Can Execute Dynamic SQL Function&quot; (exec_sql) and the 1-line fix · Ship-Ready"><meta property="og:description" content="Supabase&#x27;s Security Advisor now flags functions like exec_sql(query text) that anyone with your anon key can call to run their own SQL. What it means, a 30-second check, and the fix."><meta property="og:image" content="https://getshipready.github.io/assets/og.png"><meta name="twitter:card" content="summary_large_image"></head><body>
+<header class="nav"><div class="wrap"><a class="logo" href="../index.html"><i>✓</i>Ship-Ready</a><input type="checkbox" id="nt" class="nt" aria-label="Menu"><label for="nt" class="nt-btn" aria-hidden="true"></label>
+<nav><a href="../lite.html">Free skills</a><a href="../crew.html">The Crew</a><a href="../audit.html">Audit</a></nav></div></header>
+<main id="main">
+<section class="hero" style="padding-bottom:20px"><div class="wrap"><div class="crumb"><a href="../index.html">Ship-Ready</a> / <a href="index.html">Guides</a></div><h1>Supabase Security Advisor: &quot;Public Can Execute Dynamic SQL Function&quot; (exec_sql) and the 1-line fix</h1>
+<p>On 17 Nov 2026 Supabase's linter (<a href="https://github.com/supabase/splinter/releases/tag/2026.11.0">splinter 2026.11.0</a>) added two security checks: <strong>0031 "Public Can Execute Dynamic SQL Function"</strong> and <strong>0032 "Signed-In Users Can Execute Dynamic SQL Function"</strong>. If your Security Advisor just started showing one, here is what it means and how to fix it.</p></div></section>
+<section><div class="wrap guide">
+<h2>What it means</h2>
+<p>The lint "Detects functions callable without signing in that appear to run a SQL string passed in by the caller." The classic case is a helper like this:</p>
+<pre><code>create function public.exec_sql(query text) returns json
+language plpgsql security definer as $$ ... execute query ... $$;</code></pre>
+<p>AI builders and tutorials often add one so an agent or an admin screen can run migrations or reports from the app. The problem, in the lint's own words: "PostgREST exposes them at <code>/rest/v1/rpc/&lt;name&gt;</code>, so anyone with the anon key can run arbitrary SQL as the function owner (SECURITY DEFINER) or as <code>anon</code> (SECURITY INVOKER)."</p>
+<p>Your anon key ships in your frontend by design (see <a href="supabase-anon-key-exposed.html">is my anon key exposed?</a>), so "anyone with the anon key" means anyone who opens your site. With <code>security definer</code>, RLS does not stop them: they can read, change or delete every table.</p>
+<p>Supabase rates it <strong>ERROR</strong> when the function is <code>security definer</code> and uses the parameter directly in <code>EXECUTE</code>, and WARN otherwise.</p>
+
+<h2>30-second check</h2>
+<p>In the SQL editor:</p>
+<pre><code>select p.proname,
+       p.prosecdef as security_definer,
+       has_function_privilege('anon', p.oid, 'execute') as anon_can_call,
+       has_function_privilege('authenticated', p.oid, 'execute') as users_can_call
+from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+where n.nspname = 'public'
+  and p.prolang = (select oid from pg_language where lanname = 'plpgsql')
+  and p.prosrc ilike '%execute%';</code></pre>
+<p>Any row with <code>anon_can_call</code> or <code>users_can_call</code> = true that runs text you pass in needs fixing.</p>
+
+<h2>The fix</h2>
+<p>Supabase's first option is to revoke <code>EXECUTE</code>:</p>
+<pre><code>revoke execute on function public.exec_sql(text) from anon, authenticated, public;</code></pre>
+<p>Revoke from <strong>both</strong> roles. Supabase's <a href="https://supabase.com/docs/guides/database/database-advisors">advisor docs</a> warn: "Revoking from <code>anon</code> alone usually leaves the function callable by every signed-up user, so address both together." Server code using your secret key can still call it.</p>
+<p>If nothing needs it, drop it: <code>drop function public.exec_sql(text);</code></p>
+<p>If the app really needs it, Supabase's advice: "Expose one function per operation with typed arguments and no string-built SQL. If you have to build SQL, pass values with <code>EXECUTE ... USING</code>, quote identifiers with <code>quote_ident()</code>, and check table and column names against an allow-list."</p>
+<p>Don't just rename the function. The check looks at what the function does, and so does anyone probing your API.</p>
+
+<h2>After the fix</h2>
+<ul><li>Re-run Security Advisor; the finding clears once the grants change.</li>
+<li>If the app now shows <code>42501 permission denied</code> where it called the function, that call belonged on your server: see <a href="supabase-42501-permission-denied.html">42501 permission denied</a>.</li>
+<li>Check what a second account can see with <a href="rls-second-user-test.html">the second-user test</a>.</li></ul>
+<p>Known false positive (from Supabase's docs): <code>format('%I', param)</code> is safe but can still be flagged; use <code>quote_ident(param)</code> instead.</p>
+
+<h2>Before you launch</h2>
+<p>The free <a href="../lite.html">Ship-Ready quick scan</a> runs offline on your code and flags leaked keys, RLS turned off, <code>using (true)</code> policies and edge functions with <code>verify_jwt = false</code> and no caller check. Since v0.1.8 it also flags functions like exec_sql that anyone can call to run their own SQL (rule SQL-001). It runs locally, no code upload.</p>
+
+<p>Related: <a href="supabase-anon-key-exposed.html">Is my anon key exposed?</a> · <a href="supabase-42501-permission-denied.html">42501 permission denied</a> · <a href="supabase-legacy-api-keys-migration.html">Retiring the eyJ keys</a></p>
+</div></section></main>
+
+</body></html>
