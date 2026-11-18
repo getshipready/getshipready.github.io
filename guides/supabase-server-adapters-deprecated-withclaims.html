@@ -1,0 +1,43 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>@supabase/server adapters are removed on December 1: migrate without making your endpoints public · Ship-Ready</title>
+<meta name="description" content="The Hono, H3, Elysia and NestJS adapters in @supabase/server go away on 1 Dec 2026. One migration step (withClaims instead of withRequiredClaims) silently turns a 401 into a 200. The safe swap and a 1-minute check.">
+<link rel="canonical" href="https://getshipready.github.io/guides/supabase-server-adapters-deprecated-withclaims.html">
+<link rel="stylesheet" href="../assets/style.css"><style>.guide h2{font-size:28px;margin:40px 0 12px}.guide p{margin:10px 0;line-height:1.65}.guide pre{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;overflow-x:auto;margin:12px 0;font-size:13px;line-height:1.5}.guide table{border-collapse:collapse;margin:14px 0;width:100%;font-size:14px}.guide th,.guide td{border:1px solid #2a2a2a;padding:8px 10px;text-align:left;vertical-align:top}</style></head><body>
+<header class="nav"><div class="wrap"><a class="logo" href="../index.html"><i>✓</i>Ship-Ready</a>
+<nav><a href="../lite.html">Free skills</a><a href="../crew.html">The Crew</a><a href="../audit.html">Audit</a></nav></div></header>
+<section class="hero" style="padding-bottom:20px"><div class="wrap"><div class="crumb"><a href="../index.html">Ship-Ready</a> / <a href="index.html">Guides</a></div><h1>@supabase/server adapters are removed on December 1: migrate without making your endpoints public</h1>
+<p>If your API uses <code>withSupabase</code> from <code>@supabase/server/adapters/hono</code> (or <code>/h3</code>, <code>/elysia</code>, <code>/nestjs</code>), you have until <strong>December 1, 2026</strong>. Supabase's <a href="https://supabase.com/changelog/supabase-server-adapters-deprecated">changelog</a>: "They will be removed from the package on December 1, 2026."</p></div></section>
+<section><div class="wrap guide">
+<p>The migration is small. The risk is one step that looks right, compiles, and quietly makes a signed-in-only endpoint public. Supabase's <a href="https://supabase.com/docs/reference/server/frameworks">frameworks guide</a> says it plainly: "One step in that migration can open an endpoint up without an error."</p>
+
+<h2>Are you affected?</h2>
+<p>Search your code for <code>@supabase/server/adapters</code>. Every hit is a route group to move. Note the <code>auth</code> value on each <code>withSupabase(...)</code> call. Supabase: "A bare <code>withSupabase()</code> counts as <code>auth: 'user'</code>."</p>
+<p>Not affected: <code>withSupabase(config, handler)</code> imported from <code>@supabase/server</code> itself, the pattern Supabase recommends for Edge Functions. The changelog: "<code>withSupabase(config, handler)</code> is not deprecated."</p>
+
+<h2>The trap: withClaims is not a login check</h2>
+<p>The replacement uses middleware "entries". Two of them look interchangeable and are not:</p>
+<ul><li><code>withRequiredClaims()</code> rejects a request with no valid user token before your handler runs (401 <code>MISSING_CREDENTIALS</code>).</li>
+<li><code>withClaims()</code> adds the caller's claims <em>if a token is there</em>. Supabase's <a href="https://supabase.com/docs/reference/server/middleware-withclaims">reference</a>: "<code>withClaims</code> is not an auth gate. It never rejects a request that has no token."</li></ul>
+<p>The changelog: "Do not use <code>withClaims()</code> in place of <code>auth: 'user'</code>. The adapter rejected anonymous requests. <code>withClaims()</code> lets them through with <code>jwtClaims: null</code>, which turns a 401 into a 200 with no error."</p>
+<p>Nothing breaks in testing (you're signed in), the typecheck passes, and the route now answers anyone. If the handler uses an admin client or reads by an id from the URL, that is a data leak.</p>
+
+<h2>The safe swap</h2>
+<table><tr><th>Old adapter config</th><th>Use instead</th></tr><tr><td><code>auth: 'user'</code>, or no config</td><td><code>withRequiredClaims()</code></td></tr><tr><td><code>auth: 'none'</code></td><td>nothing (client entries only)</td></tr><tr><td><code>auth: 'publishable'</code> or <code>auth: 'secret'</code></td><td>keep <code>withSupabase</code>; there is no bridge entry</td></tr></table>
+<p>Hono example from Supabase's frameworks guide. First copy their <code>hono/supabase-middleware.ts</code> bridge into your project; it needs <code>@supabase/server</code> 1.6.0+ and Node 22+, with <code>@supabase/middleware</code> as a direct dependency.</p>
+<pre><code>import { withRequiredClaims } from &#x27;@supabase/server/middleware/required-claims&#x27;
+import { withSupabaseClient } from &#x27;@supabase/server/middleware/client&#x27;
+import { toHono } from &#x27;./lib/supabase-middleware.js&#x27;
+
+const app = new Hono()
+  .use(&#x27;*&#x27;, toHono([withRequiredClaims(), withSupabaseClient()]))</code></pre>
+<p>Then rename call sites. The adapter gave you <code>c.var.supabaseContext</code>; the entries give flat keys. <code>supabaseContext.userClaims.id</code> becomes <code>c.var.jwtClaims.sub</code>.</p>
+
+<h2>Check it in one minute</h2>
+<ol><li>After deploying, call every route that used to need a login, with no token:<pre><code>curl -i https://YOUR_API/todos</code></pre>Expect <code>401</code> with code <code>MISSING_CREDENTIALS</code>. A <code>200</code> means the route is open. Run this only against your own API.</li>
+<li>Grep for the trap:<pre><code>grep -rn &quot;withClaims()&quot; src/</code></pre>Every hit should be a route that is meant to be public, or a handler that checks <code>jwtClaims</code> is not null and returns 401 itself.</li></ol>
+
+<h2>Before you launch</h2>
+<p>The free <a href="../lite.html">Ship-Ready quick scan</a> runs offline on your code and flags leaked keys, RLS turned off, <code>using (true)</code> policies and edge functions with <code>verify_jwt = false</code> and no caller check. It does not check <code>withClaims</code> pipelines yet, so do the curl test above. The <a href="../crew.html">Crew</a> (<!--COUNT-->59-check scan<!--/COUNT-->, $39) adds more checks and a two-user test template.</p>
+
+<p>Related: <a href="supabase-edge-function-invalid-jwt-new-keys.html">Edge function 401 Invalid JWT after the new keys</a> (the <code>withSupabase</code> pattern that is not changing) · <a href="login-is-not-access-control.html">Login is not access control</a> · <a href="supabase-legacy-api-keys-migration.html">Supabase is retiring the eyJ keys</a></p>
+</div></section></body></html>
