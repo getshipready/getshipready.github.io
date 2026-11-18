@@ -1,0 +1,50 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Supabase is retiring the eyJ anon and service_role keys: the safe migration for Lovable and Bolt apps · Ship-Ready</title>
+<meta name="description" content="Supabase says the legacy anon and service_role keys go away by the end of 2026. How to tell if your Lovable, Bolt or Cursor app still uses them, the 10-minute swap, and the one mistake that puts your secret key in the public bundle.">
+<link rel="canonical" href="https://getshipready.github.io/guides/supabase-legacy-api-keys-migration.html">
+<link rel="stylesheet" href="../assets/style.css"><style>.guide h2{font-size:28px;margin:40px 0 12px}.guide p{margin:10px 0;line-height:1.65}.guide pre{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;overflow-x:auto;margin:12px 0;font-size:13px;line-height:1.5}</style></head><body>
+<header class="nav"><div class="wrap"><a class="logo" href="../index.html"><i>✓</i>Ship-Ready</a>
+<nav><a href="../lite.html">Free skills</a><a href="../crew.html">The Crew</a><a href="../audit.html">Audit</a></nav></div></header>
+<section class="hero" style="padding-bottom:20px"><div class="wrap"><div class="crumb"><a href="../index.html">Ship-Ready</a> / <a href="index.html">Guides</a></div><h1>Supabase is retiring the eyJ keys: the safe migration</h1>
+<p>If your app talks to Supabase with a long key that starts with <code>eyJ</code>, it's on the legacy <code>anon</code> or <code>service_role</code> keys, and Supabase says those are going away. The swap takes about 10 minutes. The risky part is the one an AI tool can get wrong: where the new <em>secret</em> key ends up.</p></div></section>
+<section><div class="wrap guide">
+<h2>What Supabase announced</h2>
+<p>Supabase's <a href="https://supabase.com/docs/guides/getting-started/api-keys">API keys docs</a> say it "is deprecating the <code>anon</code> and <code>service_role</code> keys by the end of 2026". The replacements are a publishable key (<code>sb_publishable_...</code>) for browsers and apps, and secret keys (<code>sb_secret_...</code>) for servers. The docs add: "If a tool, tutorial, or AI assistant tells you to copy a long key that begins with <code>eyJ</code>, it was written for the legacy keys."</p>
+<p>The <a href="https://github.com/supabase/supabase/issues/42716">timeline on GitHub</a> has two dates that matter:</p>
+<ul>
+<li>Projects restored from a pause since 1 November 2025 no longer come back with the legacy keys, and new projects don't have them at all. A free project that paused and was resumed can break for this reason alone.</li>
+<li>"Late 2026, TBC: Legacy API keys will be deleted": after that, apps that still use them stop working.</li>
+</ul>
+
+<h2>Step 1: are you affected?</h2>
+<pre><code># in your project (Lovable: sync to GitHub first)
+grep -rn "eyJ" src/ .env* 2&gt;/dev/null | grep -iv test
+grep -rn "VITE_SUPABASE_ANON_KEY\|NEXT_PUBLIC_SUPABASE_ANON_KEY" . --include=*.env* --include=*.ts --include=*.tsx 2&gt;/dev/null</code></pre>
+<p>Also check the live site: open DevTools, search the loaded JavaScript (Ctrl+Shift+F / Cmd+Option+F) for <code>eyJ</code>. Newer Lovable projects already use <code>VITE_SUPABASE_PUBLISHABLE_KEY</code>; older ones use <code>VITE_SUPABASE_ANON_KEY</code>.</p>
+
+<h2>Step 2: create the new keys</h2>
+<p>In the Supabase dashboard: Settings → API Keys → "Publishable and secret API keys". If you see "Create new API keys", your project is still on legacy keys only. Per the <a href="https://supabase.com/docs/guides/getting-started/migrating-to-new-api-keys">migration guide</a>, creating them is safe: the legacy keys keep working alongside them until you turn them off.</p>
+
+<h2>Step 3: swap the browser key, then rebuild</h2>
+<pre><code># .env (use the exact variable name your code reads)
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...</code></pre>
+<p><code>VITE_</code> and <code>NEXT_PUBLIC_</code> values are baked in when the app is built, so changing the variable does nothing until you rebuild and republish. Supabase says the publishable key has the same low privileges as <code>anon</code>, so your Row Level Security policies behave the same.</p>
+
+<h2>Step 4: the swap that leaks your database</h2>
+<p>The secret key replaces <code>service_role</code> and, like it, bypasses Row Level Security. It belongs only in servers and Edge Functions (Supabase adds <code>SUPABASE_SECRET_KEYS</code> to the functions' environment). The mistake to watch for: an AI tool "fixing" a permission error by putting <code>sb_secret_...</code> in a <code>VITE_</code> or <code>NEXT_PUBLIC_</code> variable.</p>
+<p>Supabase's docs say secret keys return HTTP 401 when used from a browser, matched on the <code>User-Agent</code> header. That blocks browsers, not scripts: the key is still in your public bundle for anyone to copy. Check the build:</p>
+<pre><code>npm run build
+grep -rlE "sb_secret_|service_role" dist/ .next/static/ build/ 2&gt;/dev/null</code></pre>
+<p>Any hit: move that call into an Edge Function or server route, then rotate the key in the dashboard. Deleting the line isn't enough; it's still in git history and old deploys.</p>
+
+<h2>Step 5: before you turn the old keys off</h2>
+<p>Supabase's checklist: there's no automatic usage indicator, so check every place that holds a key, including CI/CD and deploy scripts, webhooks and third-party integrations, cron jobs, workers and <code>pg_net</code> calls, and mobile builds already in users' hands. Deactivating the legacy keys in Settings → API Keys is reversible if you missed one.</p>
+
+<h2>New key, same holes</h2>
+<p>Swapping keys changes nothing about who can read what. If a table was readable with the <code>anon</code> key, it's readable with the publishable key too. While you're in there, run the <a href="supabase-anon-key-exposed.html">5-minute anon-key check</a> and the <a href="rls-second-user-test.html">second-user test</a>.</p>
+
+<h2>Catch it in the repo</h2>
+<p>The free <a href="../lite.html">Ship-Ready quick scan</a> runs offline on your code and flags service or secret keys in public env vars, RLS turned off and <code>using (true)</code> policies. The <a href="../crew.html">Crew</a> (<!--COUNT-->59-check scan<!--/COUNT-->, $39) adds more checks and a two-user test template.</p>
+
+<p>Related: <a href="supabase-anon-key-exposed.html">is my anon key a problem?</a> · <a href="supabase-42501-permission-denied.html">42501 permission denied after the Oct 30 change</a> · <a href="rls-second-user-test.html">test your app as a second user</a></p>
+</div></section></body></html>
