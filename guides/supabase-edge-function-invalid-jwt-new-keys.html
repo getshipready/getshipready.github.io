@@ -1,0 +1,69 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Supabase edge function returns 401 "Invalid JWT" after switching to the new API keys: the safe fix · Ship-Ready</title>
+<meta name="description" content="Moved to sb_publishable / sb_secret keys and your edge functions now return 401 Invalid JWT? Here&#x27;s the fix, and the step that keeps the function from going public.">
+<link rel="canonical" href="https://getshipready.github.io/guides/supabase-edge-function-invalid-jwt-new-keys.html">
+<link rel="stylesheet" href="../assets/style.css"><style>.guide h2{font-size:28px;margin:40px 0 12px}.guide p{margin:10px 0;line-height:1.65}.guide pre{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;overflow-x:auto;margin:12px 0;font-size:13px;line-height:1.5}.guide table{border-collapse:collapse;margin:14px 0;width:100%;font-size:14px}.guide th,.guide td{border:1px solid #2a2a2a;padding:8px 10px;text-align:left;vertical-align:top}</style></head><body>
+<header class="nav"><div class="wrap"><a class="logo" href="../index.html"><i>✓</i>Ship-Ready</a>
+<nav><a href="../lite.html">Free skills</a><a href="../crew.html">The Crew</a><a href="../audit.html">Audit</a></nav></div></header>
+<section class="hero" style="padding-bottom:20px"><div class="wrap"><div class="crumb"><a href="../index.html">Ship-Ready</a> / <a href="index.html">Guides</a></div><h1>Supabase edge function returns 401 "Invalid JWT" after switching to the new API keys: the safe fix</h1>
+<p>You switched your app from the old <code>eyJ…</code> anon key to the new <code>sb_publishable_…</code> key (Supabase retires the old keys by the end of 2026), and now your edge functions answer every call with:</p></div></section>
+<section><div class="wrap guide">
+<pre><code>401 {&quot;message&quot;:&quot;Invalid JWT&quot;}</code></pre>
+
+<p>Your function code never ran. The 401 comes from the platform, before your code.</p>
+
+<h2>Why it happens</h2>
+
+<p>Supabase's <a href="https://supabase.com/docs/guides/getting-started/migrating-to-new-api-keys">migration guide</a> explains it: if the new key is sent on the <code>Authorization: Bearer</code> header, "the platform tries to parse it as a JWT and rejects the request with Invalid JWT. The platform's built-in verify_jwt check only understands the legacy JWT-based keys, so set verify_jwt = false for these functions and authorize the request in your own code."</p>
+
+<p>The <a href="https://supabase.com/kb/troubleshooting/edge-function-401-error-response">401 troubleshooting page</a> says the same: "Supabase now recommends turning off this built-in check and managing authentication directly in your function code, giving you more control over access."</p>
+
+<h2>The trap: the official fix only does half the job</h2>
+
+<p>Every fix you'll find says: set <code>verify_jwt = false</code>. That makes the 401 go away. It also removes the only thing that was stopping strangers from calling your function. Supabase's own words (<a href="https://supabase.com/docs/guides/functions/auth">Securing Edge Functions</a>): turning it off "to clear a 401 during development removes the platform's check, leaving withSupabase as the only thing that verifies the caller."</p>
+
+<p>If your function has no check of its own (very common in code written by Lovable, Bolt or an AI agent), it is now public. Anyone with the URL can run it: send email through your account, spend your OpenAI or Lovable AI credit, or write to your database with the service key.</p>
+
+<p>So the fix is two steps, always together.</p>
+
+<h2>Step 1: turn off the legacy check, for that function only</h2>
+
+<p>In <code>supabase/config.toml</code>:</p>
+
+<pre><code>[functions.my-function]
+verify_jwt = false</code></pre>
+
+<p>(or the toggle on the function's page in the Supabase dashboard). Don't turn it off for functions you haven't done Step 2 on.</p>
+
+<h2>Step 2: check the caller inside the function</h2>
+
+<p>Supabase's recommended way is the <code>@supabase/server</code> SDK. The migration guide: "Keep verify_jwt = false so the SDK does the authorization."</p>
+
+<pre><code>import { withSupabase } from &#x27;npm:@supabase/server@1&#x27;
+
+Deno.serve(
+  withSupabase({ auth: &#x27;user&#x27; }, async (_req, ctx) =&gt; {
+    // ctx.supabase is scoped to the signed-in user (RLS applies)
+    return Response.json({ email: ctx.userClaims?.email })
+  })
+)</code></pre>
+
+<p>Pick the mode per function:</p>
+
+<table><tr><th>Who calls it</th><th><code>auth</code> mode</th><th>Note</th></tr><tr><td>Your signed-in users (from the app)</td><td><code>'user'</code></td><td>Most app functions. Rejects anyone not logged in.</td></tr><tr><td>A cron job, another function, your backend</td><td><code>'secret'</code></td><td>Secret key on the <code>apikey</code> header. Never in the browser.</td></tr><tr><td>Anyone with your app (public data)</td><td><code>'publishable'</code></td><td>The publishable key is public, so this does not stop strangers. Add a rate limit.</td></tr><tr><td>Stripe or another webhook</td><td><code>'none'</code> + verify the signature</td><td>Check <code>stripe-signature</code> with <code>constructEventAsync</code> before doing anything.</td></tr></table>
+
+<p>Not on the SDK? The older pattern still works: create a client with the caller's <code>Authorization</code> header, call <code>supabase.auth.getUser()</code>, and return 401 if there's no user.</p>
+
+<h2>Also fix the client call</h2>
+
+<p>The new keys aren't JWTs, so send them on the <code>apikey</code> header, not <code>Authorization: Bearer</code>. <code>supabase.functions.invoke()</code> from a signed-in session sends the user's JWT for you. Supabase's guide warns that a function passing the platform check "doesn't authenticate a caller that sends only an API key, so authorize the key in your handler."</p>
+
+<h2>Check you didn't open anything</h2>
+
+<ol><li>Search <code>supabase/config.toml</code> for <code>verify_jwt = false</code>. For each function listed, open its <code>index.ts</code> and confirm one of: <code>withSupabase({ auth: 'user' | 'secret' })</code>, <code>auth.getUser()</code>, or a webhook signature check before any work.</li><li>Call it with no headers at all:<pre><code>curl -i -X POST https://YOUR-PROJECT.supabase.co/functions/v1/my-function</code></pre></li><li>Or run the free <a href="../lite.html">Ship-Ready quick scan</a> (offline, reads files only). Check AUTH-010 flags any function with <code>verify_jwt = false</code> and no caller check:<pre><code>python3 skills/ship-ready-quick-scan/scripts/quickscan.py path/to/app</code></pre></li></ol>
+
+<h2>Catch it in the repo</h2>
+<p>The free <a href="../lite.html">Ship-Ready quick scan</a> runs offline on your code and flags edge functions with <code>verify_jwt = false</code> and no caller check, plus leaked keys, RLS turned off and <code>using (true)</code> policies. The <a href="../crew.html">Crew</a> (<!--COUNT-->59-check scan<!--/COUNT-->, $39) adds more checks and a two-user test template.</p>
+
+<p>Related: <a href="supabase-legacy-api-keys-migration.html">Supabase is retiring the eyJ keys: the safe migration</a> · <a href="stripe-webhook-not-verified.html">Stripe webhook not verified</a> · <a href="supabase-anon-key-exposed.html">is my anon key a problem?</a></p>
+</div></section></body></html>

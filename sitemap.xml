@@ -18,4 +18,5 @@
   <url><loc>https://getshipready.github.io/guides/url-scan-vs-two-account-test.html</loc></url>
   <url><loc>https://getshipready.github.io/guides/supabase-42501-permission-denied.html</loc></url>
   <url><loc>https://getshipready.github.io/guides/supabase-legacy-api-keys-migration.html</loc></url>
+  <url><loc>https://getshipready.github.io/guides/supabase-edge-function-invalid-jwt-new-keys.html</loc></url>
 </urlset>
