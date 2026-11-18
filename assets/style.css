@@ -356,3 +356,4 @@ summary:focus-visible{outline-offset:-2px}
   .score-card .verdict{animation:v2-tick 4.4s ease-in-out infinite}
   @keyframes v2-tick{0%,35%,100%{filter:none}50%{filter:brightness(1.35) drop-shadow(0 0 6px rgba(61,220,151,.35))}}
 }
+.install .c{background:transparent;font-family:inherit}
