@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ship-Ready sample report · PromptPad, 49 findings, 0/100</title><meta name="description" content="The full, unedited Ship-Ready scanner report for PromptPad, a deliberately broken Next.js + Supabase + Stripe demo app: 49 findings, 13 critical, file and line on each.">
-<meta property="og:title" content="Ship-Ready sample report · PromptPad, 49 findings, 0/100"><meta property="og:description" content="The full, unedited Ship-Ready scanner report for PromptPad, a deliberately broken Next.js + Supabase + Stripe demo app: 49 findings, 13 critical, file and line on each."><meta property="og:image" content="https://getshipready.github.io/assets/og.png"><meta name="twitter:card" content="summary_large_image">
+<title>Ship-Ready sample report · PromptPad, 48 findings, 0/100</title><meta name="description" content="The full, unedited Ship-Ready scanner report for PromptPad, a deliberately broken Next.js + Supabase + Stripe demo app: 48 findings, 13 critical, file and line on each.">
+<meta property="og:title" content="Ship-Ready sample report · PromptPad, 48 findings, 0/100"><meta property="og:description" content="The full, unedited Ship-Ready scanner report for PromptPad, a deliberately broken Next.js + Supabase + Stripe demo app: 48 findings, 13 critical, file and line on each."><meta property="og:image" content="https://getshipready.github.io/assets/og.png"><meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Fraunces:ital,wght@1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/style.css"><link rel="icon" href="../assets/icon-512.png"><link rel="canonical" href="https://getshipready.github.io/sample/"><meta property="og:url" content="https://getshipready.github.io/sample/"></head><body>
 <header class="nav"><div class="wrap"><a class="logo" href="../index.html"><i>✓</i>Ship-Ready</a><input type="checkbox" id="nt" class="nt" aria-label="Menu"><label for="nt" class="nt-btn" aria-hidden="true"></label>
@@ -17,8 +17,9 @@
 <p class="lead" style="font-size:17px;margin-top:12px">The Crew runs this scan on your repo, routes every finding to a named specialist and helps you fix it, re-scan by re-scan. The fixed PromptPad scored 99/100.</p></div>
 <div class="cta-row"><a class="btn btn-primary" href="../crew/">Get the Crew · $39</a><a class="btn btn-ghost" href="../lite/">Start free with Lite</a><a class="btn btn-ghost" href="../audit/">Have us run it · $129</a></div></div></div></section>
 <section class="line-top"><div class="wrap narrow md"><h1>Ship-Ready report: <code>promptpad-app</code></h1>
-<p><em>Scanner v1.0.0 · 2026-10-21 15:15 UTC · agents: sentinel, warden, keymaster, tally, pilot, torque, medic, beacon · 16 files read</em></p>
+<p><em>Scanner v1.0.0 · 2026-11-19 21:08 UTC · agents: sentinel, warden, keymaster, tally, pilot, torque, medic, beacon · 16 files read</em></p>
 <h2>Verdict: <strong>DO NOT SHIP</strong> · Ship score <strong>0/100</strong></h2>
+<p><em>Score counts each rule once, at its worst severity. The tables below list every occurrence.</em></p>
 <table>
 <thead>
 <tr>
@@ -31,7 +32,7 @@
 <tbody>
 <tr>
 <td>13</td>
-<td>7</td>
+<td>6</td>
 <td>18</td>
 <td>11</td>
 </tr>
@@ -77,7 +78,7 @@
 </li>
 <li><strong>[CRITICAL] RLS-004 <code>profiles</code>: users can update their own privileged columns (is_pro, role) → self-promotion to admin/pro</strong> (Warden · Supabase RLS &amp; storage) at <code>supabase/migrations/001_init.sql:10</code><ul>
 <li>Why: The policy lets a user update ANY column of their own row, including role/plan flags. One API call from the browser console makes them admin or Pro for free.</li>
-<li>Fix: Move privileged flags to a table users cannot write (e.g. <code>entitlements</code>, written only by the webhook with the service role), or revoke table-wide and re-grant safe columns only: <code>revoke update on public.profiles from authenticated, anon; grant update (display_name, avatar_url) on public.profiles to authenticated;</code> plus <code>with check</code>. (A column-level revoke alone does nothing while the table-level grant exists.)</li>
+<li>Fix: Move privileged flags to a table users cannot write (e.g. <code>entitlements</code>, written only by the webhook with the service role), or revoke table-wide and re-grant safe columns only: <code>revoke update on public.profiles from authenticated, anon; grant update (display_name, avatar_url) on public.profiles to authenticated;</code>. (A column-level revoke alone does nothing while the table-level grant exists; WITH CHECK alone does not stop column changes on your own row.)</li>
 </ul>
 </li>
 <li><strong>[CRITICAL] RLS-006 Supabase client built with the service_role key in a shared/client module (RLS bypassed app-wide)</strong> (Warden · Supabase RLS &amp; storage) at <code>src/lib/supabaseClient.ts:6</code><ul>
@@ -113,11 +114,6 @@
 <li><strong>[HIGH] RLS-003 <code>notes</code>: insert policy "Users insert notes" accepts any row (<code>with check (true)</code>)</strong> (Warden · Supabase RLS &amp; storage) at <code>supabase/migrations/001_init.sql:23</code><ul>
 <li>Why: Users can insert rows owned by someone else (spoofed user_id) or spam the table.</li>
 <li>Fix: <code>with check (auth.uid() = user_id)</code> and set <code>user_id default auth.uid()</code>.</li>
-</ul>
-</li>
-<li><strong>[HIGH] RLS-004 <code>notes</code>: update policy "Users update own notes" has no WITH CHECK (ownership can be reassigned)</strong> (Warden · Supabase RLS &amp; storage) at <code>supabase/migrations/001_init.sql:24</code><ul>
-<li>Why: Without WITH CHECK, a user can update their row and set user_id to someone else's id (or move data between tenants).</li>
-<li>Fix: Add <code>with check (auth.uid() = user_id)</code> mirroring the USING clause.</li>
 </ul>
 </li>
 <li><strong>[HIGH] RLS-005 Storage bucket <code>exports</code> is public and its name suggests private files</strong> (Warden · Supabase RLS &amp; storage) at <code>supabase/migrations/001_init.sql:35</code><ul>
@@ -212,7 +208,7 @@
 </tr>
 </tbody>
 </table>
-<h3>Warden · Supabase RLS &amp; storage (8)</h3>
+<h3>Warden · Supabase RLS &amp; storage (7)</h3>
 <table>
 <thead>
 <tr>
@@ -261,13 +257,6 @@
 </tr>
 <tr>
 <td>high</td>
-<td>RLS-004</td>
-<td><code>notes</code>: update policy "Users update own notes" has no WITH CHECK (ownership can be reassigned)</td>
-<td><code>supabase/migrations/001_init.sql:24</code></td>
-<td><code>using (auth.uid() = user_id)</code></td>
-</tr>
-<tr>
-<td>high</td>
 <td>RLS-005</td>
 <td>Storage bucket <code>exports</code> is public and its name suggests private files</td>
 <td><code>supabase/migrations/001_init.sql:35</code></td>
@@ -299,7 +288,7 @@
 <td>AUTH-002</td>
 <td>API route changes data without checking who is calling</td>
 <td><code>src/app/api/notes/route.ts:9</code></td>
-<td><code>DELETE</code></td>
+<td><code>export async function DELETE</code></td>
 </tr>
 <tr>
 <td>high</td>
@@ -501,14 +490,14 @@
 <td>medium</td>
 <td>BUG-003</td>
 <td>Query may run with an undefined user id</td>
-<td><code>src/app/admin/page.tsx:11</code></td>
+<td><code>src/app/billing/success/page.tsx:9</code></td>
 <td><code>.eq("id", data.user?.id)</code></td>
 </tr>
 <tr>
 <td>medium</td>
 <td>BUG-003</td>
 <td>Query may run with an undefined user id</td>
-<td><code>src/app/billing/success/page.tsx:9</code></td>
+<td><code>src/app/admin/page.tsx:11</code></td>
 <td><code>.eq("id", data.user?.id)</code></td>
 </tr>
 <tr>
@@ -598,7 +587,7 @@
 </tbody>
 </table>
 <h2>Fix prompts: paste one, fix one (excerpt)</h2>
-<p>With the Crew, every finding also comes with a ready-to-paste prompt for Lovable, Bolt or Cursor, scoped to that one file and fix. Three of the 49 from this report:</p>
+<p>With the Crew, every finding also comes with a ready-to-paste prompt for Lovable, Bolt or Cursor, scoped to that one file and fix. Three of the 48 from this report:</p>
 <h3>[CRITICAL] SEC-001 · Stripe LIVE secret key committed in env file</h3>
 <details><summary>Lovable chat</summary><pre><code>Fix one security/launch issue in my app. Change only what this needs.
 Issue (SEC-001, critical): Stripe LIVE secret key committed in env file.
@@ -671,6 +660,7 @@ When done: summarise the diff in 3 bullets and tell me how to check it worked.</
 <li>[ ] <strong>Sentinel</strong>: Run <code>npm audit --omit=dev</code> (or <code>pnpm audit</code>) and fix critical/high advisories in production dependencies.</li>
 <li>[ ] <strong>Sentinel</strong>: If any key was ever committed, rotate it even if the repo is private, and check provider logs for use.</li>
 <li>[ ] <strong>Sentinel</strong>: Scan the deployed site with securityheaders.com and confirm headers are present in production, not just in config.</li>
+<li>[ ] <strong>Warden</strong>: No explicit Data API grant for: <code>notes</code>, <code>payments</code>, <code>profiles</code>. On Supabase projects created after 30 Oct 2026 these tables are not auto-granted and supabase-js returns <code>42501 permission denied</code>. Grant to the narrowest role in the same migration (<code>authenticated</code>; <code>service_role</code> for server-only tables; <code>anon</code> select only if truly public) and keep RLS on. Never fix 42501 by disabling RLS.</li>
 <li>[ ] <strong>Warden</strong>: Run <code>rls-live-check.sql</code> in the Supabase SQL editor: migrations can differ from what is live (dashboard edits). Paste the output to Warden.</li>
 <li>[ ] <strong>Warden</strong>: Test as an attacker: with only the anon key, <code>curl "$SUPABASE_URL/rest/v1/&lt;table&gt;?select=*" -H "apikey: $ANON"</code> for every table. Expect [] or 401 for private tables.</li>
 <li>[ ] <strong>Keymaster</strong>: Confirm email confirmation is ON and the Site URL / Redirect URLs in Supabase Auth match your production domain (not localhost).</li>
