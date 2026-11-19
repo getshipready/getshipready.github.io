@@ -58,7 +58,7 @@
 <p>Your agent's tech lead. Harbor reads the repo, runs the scanner, decides who works on what, stops at the gates where only you should act, and hands you a scored report.</p>
 <ul style="margin-top:10px"><li>Maps your stack and data flows</li><li>Runs the 59-check scan</li><li>Routes work to the right specialist</li><li>Holds two human gates</li><li>Writes the ship report and score</li></ul></div>
 <div class="agent"><div class="av">🛡</div><h3>Sentinel</h3><div class="role">Security</div><ul><li>Leaked & public-prefixed keys</li><li>Stored XSS, headers, CSP</li><li>Prompt-injection text in repo</li><li>AI-credit abuse</li></ul></div>
-<div class="agent"><div class="av">🔒</div><h3>Warden</h3><div class="role">Supabase RLS</div><ul><li>RLS off / using(true)</li><li>Missing WITH CHECK</li><li>Self-promotion to admin</li><li>Public buckets, service_role</li></ul></div>
+<div class="agent"><div class="av">🔒</div><h3>Warden</h3><div class="role">Supabase RLS</div><ul><li>RLS off / using(true)</li><li>Weak WITH CHECK</li><li>Self-promotion to admin</li><li>Public buckets, service_role</li></ul></div>
 <div class="agent"><div class="av">🔑</div><h3>Keymaster</h3><div class="role">Auth</div><ul><li>Client-only admin checks</li><li>Unauthenticated API routes</li><li>Redirect & OAuth bugs</li><li>Middleware + getUser()</li></ul></div>
 <div class="agent"><div class="av">💳</div><h3>Tally</h3><div class="role">Stripe payments</div><ul><li>Unsigned webhooks</li><li>Price tampering</li><li>Client-set is_pro</li><li>Test → live switch</li></ul></div>
 <div class="agent"><div class="av">🚀</div><h3>Pilot</h3><div class="role">Deploy</div><ul><li>Env var matrix</li><li>Ignored build errors</li><li>Domains & previews</li><li>Rollback plan</li></ul></div>
