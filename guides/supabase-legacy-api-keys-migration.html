@@ -44,6 +44,14 @@ grep -rlE "sb_secret_|service_role" dist/ .next/static/ build/ 2&gt;/dev/null</c
 <h2>Step 5: before you turn the old keys off</h2>
 <p>Supabase's migration guide says there's no automatic usage indicator (its <a href="https://supabase.com/docs/guides/auth/signing-keys">signing keys FAQ</a> mentions "last used" indicators on the API Keys page, so look there too, but don't rely on it alone). Check every place that holds a key, including CI/CD and deploy scripts, webhooks and third-party integrations, cron jobs, workers and <code>pg_net</code> calls, and mobile builds already in users' hands. Deactivating the legacy keys in Settings → API Keys is reversible if you missed one.</p>
 
+<h3>Gotcha: Database Webhooks and pg_net calls</h3>
+<p>If a Database Webhook or a <code>net.http_post</code> call sends <code>Authorization: Bearer &lt;service_role key&gt;</code>, don't just paste the new secret key into that header. Secret keys aren't JWTs, so Supabase rejects them there. Put the secret key on the <code>apikey</code> header instead (<a href="https://supabase.com/docs/guides/getting-started/migrating-to-new-api-keys">Supabase migration guide</a>).</p>
+<pre><code>headers := jsonb_build_object(
+  'Content-Type', 'application/json',
+  'apikey', 'sb_secret_...'
+)</code></pre>
+<p>Our own advice, not Supabase's: keep that secret out of migration files you commit. Store it in Vault and read it from there.</p>
+
 <h2>New key, same holes</h2>
 <p>Swapping keys changes nothing about who can read what. If a table was readable with the <code>anon</code> key, it's readable with the publishable key too. While you're in there, run the <a href="supabase-anon-key-exposed.html">5-minute anon-key check</a> and the <a href="rls-second-user-test.html">second-user test</a>.</p>
 
