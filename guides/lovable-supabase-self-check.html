@@ -12,6 +12,9 @@
 <section><div class="wrap guide" style="max-width:820px;padding-bottom:60px">
 <h2>Why this matters</h2>
 <p>The anon key in your frontend is public on purpose. Every visitor gets it. Row Level Security (RLS) policies are the only thing deciding what that key can read. In November 2026 a Hamburg security firm checked 34,545 Lovable apps on Supabase. On 7,403 of them it could read tables holding email addresses with nothing but that public key (<a href="https://www.crissyfield.de/research/lovable-en/">Crissy Field</a>). Nobody broke in: the database rules let strangers through. The firm notes this is not a confirmed leak rate and its sample isn't representative of all Lovable apps.</p>
+<h2>Didn't Lovable and Supabase fix this?</h2>
+<p>Not for tables that are already open. Since 12 November 2026, Lovable asks you to review critical security findings before you publish, but only for projects on its built-in backend, and you can still choose "Publish anyway" (<a href="https://docs.lovable.dev/features/publish">Lovable docs</a>). If your app talks to your own Supabase project, that dialog doesn't apply. Supabase's 30 October change only affects new tables: existing tables keep their current grants and stay reachable. An app that was readable on 29 October is still readable until someone changes its policies. The two-account test below takes about ten minutes either way.</p>
+<p>Lovable's sensitive-data (PII) detection also covers only built-in databases and storage (<a href="https://docs.lovable.dev/integrations/supabase">Lovable docs</a>), so on your own Supabase project nothing flags a table full of customer emails for you.</p>
 
 <h2>1. Tables with RLS turned off</h2>
 <pre><code>select tablename from pg_tables
